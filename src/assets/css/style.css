@@ -1,0 +1,114 @@
+/* Custom Stylesheet */
+/**
+ * Use this file to override Materialize files so you can update
+ * the core Materialize files in the future
+ *
+ * Made By MaterializeCSS.com
+ */
+
+.icon-block {
+  padding: 0 15px;
+}
+.icon-block .material-icons {
+	font-size: inherit;
+}
+
+/*   ****************** SiggyWorks CSS *************** */
+
+/* Header/Nav */
+.nhm-brand-logo {
+	display: inline-block;
+	height: inherit;
+}
+.nhm-logo {
+	height: inherit;
+	width: auto;
+}
+.login-panel-trigger {
+	float: left;
+	position: relative;
+}
+
+#main-nav {
+	z-index: 100;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+}
+
+/* Side Panel */
+.side-panel {
+	padding:20px;
+	color: #676767;
+}
+.side-panel-logo img {
+	max-width: 90px;
+	height: auto;
+}
+
+.search-form-wrapper {
+	display: none;
+}
+.search-form-wrapper.active {
+	display: block;
+}
+
+
+/* Map Container */
+.map-container {
+	width: 100vw;
+	height: 100vh;
+	
+	background-color: #999;
+}
+
+/* Account Container */
+.account-container {
+	height: 100vh;
+}
+
+/*  Custom Footer */
+.--page-footer {
+	width: 100vw;
+	position: fixed;
+	bottom: 0px;
+	left: 0px;
+	color: white;
+	font-size: 0.9em;
+	font-weight: 400;
+	padding: 10px;
+	z-index: 99;
+}
+.footer-copyright {
+	font-size: 0.9em;
+}
+
+
+/*  Generics  */
+.nhm-dark-blue {
+	background-color: #282C35;
+}
+.nhm-blue {
+	color: #23A1CB;
+}
+.nhm-bg-blue, .btn, .btn:hover {
+	background-color: #23A1CB; 
+}
+label.active {
+	color: #23A1CB !important;
+}
+input[type=text]:focus:not([readonly]),
+input[type=email]:focus:not([readonly]),
+input[type=password]:focus:not([readonly]) {
+	border-bottom: 1px solid #23A1CB !important;
+}
+[type="checkbox"].filled-in:checked + label:after {
+	border-color: #23A1CB;
+	background-color: #23A1CB;
+}
+.padding {
+	padding: 20px;
+}
+.pad-top {
+	padding-top: 0.75rem;
+}
