@@ -97,8 +97,23 @@
 
 	    <div class="search-results">
 	      <div v-show="results.length > 0" class="row">
-	        {{ results }}
+	        <em>{{results.length}} organizations found</em><br/>
+			<ul v-for="provider in results" class="collection">
+			    <li v-for="location in provider.locations" class="collection-item avatar">
+			    	
+		      		<img v-if="provider.avatar" :src="provider.avatar" alt="" class="circle" />
+		      		<img v-else :src="getServiceIcon(provider)" alt="" class="circle" />
+		      		<span class="title" @click="doProviderClicked(provider, location)">{{ provider.name }}</span>
+			      	<p><!-- {{ location.name }}<br/>
+			        	{{ location.address1 }}<br/>
+			        	<span v-if="location.address2">{{ location.address2 }} -->
+			        	{{ location.zip }}
+			      	</p>
+			      <!-- <a href="#!" class="secondary-content"><i class="material-icons">grade</i></a> -->
+			    </li>
+			</ul>
 	      </div>
+
 	      <div v-show="results.length == 0" class="row">
 	      	No Results Found!
 	      </div>
@@ -155,6 +170,7 @@
 				Materialize.updateTextFields();  //update the text fields
 
 				//console.log(this.results, this.resourceType);
+				this.$emit('clear-results');
 			});
 
 			console.log("NhmResultsPanel mounted", this.services);
@@ -236,6 +252,25 @@
 						break;
 				}
 				this.$emit('do-search', params);
+			},
+			getServiceIcon(provider) {
+				var p_srvc = provider ? provider.services[0].id : '',
+					srvc = this.selected_service ? parseInt(this.selected_service) : p_srvc;
+
+				//console.log(provider, srvc, p_srvc);
+
+				for(let x=0; x < this.services.length; x++) {
+					//console.log(srvc, this.services[x])
+					if(this.services[x].id === srvc) {
+						return this.services[x].icon;
+					}
+				}
+				console.log('returning ../assets/img/mhrc_logo.png')
+				return "/static/img/mhrc_logo.png";
+			},
+			doProviderClicked(provider, location) {
+				console.log('provider clicked: ' + provider.name + ' ' + location.name);
+				this.$emit('popup-provider', provider.id, location);
 			}
 		},
 		directives: {
@@ -265,6 +300,20 @@
 	.side-panel {
 		padding:20px;
 		color: #676767;
+	}
+
+	.search-results {
+		padding-bottom: 20px;
+	}
+
+	.collection .collection-item p {
+		font-size: 0.85em !important;
+		font-weight: 400;
+	}
+	.collection-item .title {
+		font-size: 0.88em !important;
+		font-weight: 600 !important;
+		cursor: pointer;
 	}
 
 </style>

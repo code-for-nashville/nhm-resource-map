@@ -36,6 +36,12 @@
 				resourceMap: null,
 			};
 		},
+		props: {
+			markers: {
+				type: Array, 
+				required: false
+			}
+		},
 		created() {
 		},
 
@@ -48,6 +54,7 @@
 					div: '#map',
 					lat: 36.174465,
 					lng: -86.767960,
+					zoom: 13
 				});
 			} else {
 				console.log("...could not find GMaps on window object.");
@@ -63,28 +70,48 @@
 				//console.log(this.results, this.resourceType);
 			});
 
-			console.log("NhmMap mounted");
+			this.$on('update-markers', markers => {
+				console.log('updating markers', this.markers);
+			})
+
+			console.log("NhmMap mounted", this.markers);
 		},
 
 		updated() {
 			//update markers if necessary
+			console.log('map should update markers...', this.markers);
 		},
 
 		methods: {
-			doSearch: function(param) {
-				// fetch the services
-				/*
-				nhmservice.getServices(this).then((response) => {
-					this.services = response.data;
-					//this.$set(this.services, response.data);
-					console.log('got data...', this.services);
-					//$('select:not([multiple])').material_select();
+			doSearch: function(param) {}
+		},
 
-				}, (err) => {
-					//context.error = err;
-					console.log('whoops...error...', err);
+		watch: {
+			markers: function(oldMarkers) {
+				var self = this;
+				console.log('markers changed in map to: ', this.markers);
+				this.resourceMap.removeMarkers();
+				var renderMarkers = this.markers.map((val, idx) => {
+					//console.log(val);
+					return {
+					  lat: parseFloat(val.latitude),
+					  lng: parseFloat(val.longitude),
+					  title: val.provider_name,
+					  icon: {
+					  	scaledSize: new google.maps.Size(30, 30),
+					  	url: val.icon
+					  },
+					  click: (e) => {
+					    console.log('You clicked on ' + val.name + '!');
+					    this.$emit('popup-provider', val.provider_id, val);
+					  },
+					  mouseover: (e) => {
+					  	Materialize.toast(val.item_name, 2600, 'rounded');
+					  }
+					};
 				});
-				*/
+				console.log(renderMarkers);
+				this.resourceMap.addMarkers(renderMarkers);
 			}
 		}
 	}
