@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <nhm-navbar v-on:show-login-bar="doShowLoginBar"></nhm-navbar>
-    <nhm-login-bar></nhm-login-bar>
+    <nhm-login-bar v-on:provider-authenticated="doProviderAuthenticated"></nhm-login-bar>
     <nhm-map v-bind:markers="markers" v-on:popup-provider="doPopupProvider"></nhm-map>
     <nhm-results-panel 
       v-on:do-search="doHandleSearch"
@@ -60,7 +60,8 @@
         resourceType: resourceTypes.RESOURCES.name,
         results: [],
         markers: [],
-        selected_provider: {}
+        selected_provider: {},
+        provider: {},
       };
     },
     created() {
@@ -152,6 +153,12 @@
         }
 
         console.log('popup-provider event heard...', provider_id);
+      },
+
+      doProviderAuthenticated: function(provider) {
+        if(provider) {
+          this.provider = provider;
+        }
       },
 
       updateMarkers: function() {

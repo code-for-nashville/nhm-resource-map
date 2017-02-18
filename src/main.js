@@ -9,6 +9,7 @@ import App from './App'
 require('materialize-css/dist/js/materialize');
 
 Vue.use(VueResource);
+Vue.http.options.emulateJSON = true;
 
 /* eslint-disable no-new */
 export const eventBus = new Vue();
@@ -21,7 +22,11 @@ export const resourceTypes = {
 
 new Vue({
   el: '#app',
-  render: h => h(App)
+  render: h => h(App),
+  http: {
+  	emulateJSON: true,
+    emulateHTTP: true
+  }
 });
 
 /*

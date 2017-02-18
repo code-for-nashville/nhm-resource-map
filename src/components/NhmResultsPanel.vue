@@ -77,7 +77,7 @@
 	            </div>
 	          
 	            <div class="input-field col s12">
-	              <select class="icons" name="service" v-change="doServiceChange">
+	              <select class="icons service-options" name="service" v-change="doServiceChange">
 	                <option value="" selected>Choose a service</option>
 	                <option v-for="srvc in services" :value="srvc.id" :data-icon="srvc.icon" class="left circle">{{srvc.name}}</option>
 	              </select>
@@ -304,6 +304,10 @@
 
 	.search-results {
 		padding-bottom: 20px;
+	}
+
+	.service-options, .service-options option {
+		font-size: 0.85em !important;
 	}
 
 	.collection .collection-item p {

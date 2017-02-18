@@ -4,6 +4,7 @@
 
 // URL and endpoint constants
 const API_URL = 'http://127.0.0.1:8000/resources/'
+const BASE_URL = 'http://127.0.0.1:8000/'
 const LOGIN_URL = API_URL + 'account/authenticate/'
 const SIGNUP_URL = API_URL + 'account/register/'
 
@@ -66,6 +67,13 @@ export default {
 		return {
 			'Authorization': 'Bearer ' + localStorage.getItem('id_token')
 		}
+	},
+
+	// Provider--Request Access
+	providerRequestAccess(context, params) {
+		console.log(params);
+		const endpoint = BASE_URL + 'account/request-access/';
+		return context.$http.post(endpoint, params);
 	},
 
 	/* *************** read endpoint wrappers ***************** */
