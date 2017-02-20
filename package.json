@@ -12,7 +12,8 @@
     "gmaps": "^0.4.24",
     "materialize-css": "^0.98.0",
     "vue": "^2.1.0",
-    "vue-resource": "^1.2.0"
+    "vue-resource": "^1.2.0",
+    "vue-router": "^2.2.1"
   },
   "devDependencies": {
     "autoprefixer": "^6.4.0",
