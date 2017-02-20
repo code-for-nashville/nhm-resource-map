@@ -3,11 +3,18 @@
 require('materialize-css/dist/css/materialize.css');
 
 import Vue from 'vue'
+import VueRouter from 'vue-router'
 import VueResource from 'vue-resource'
 import App from './App'
+import Mapp from './Mapp'
+import Provider from './Provider'
+import Events from './Events'
+import UrgentNeeds from './UrgentNeeds'
+import Faq from './Faq'
 
 require('materialize-css/dist/js/materialize');
 
+Vue.use(VueRouter);
 Vue.use(VueResource);
 Vue.http.options.emulateJSON = true;
 
@@ -20,8 +27,22 @@ export const resourceTypes = {
     URGENTNEEDS: { name: 'urgent-needs', display: 'Urgent Needs'}
 };
 
+const routes = [
+		{ path: '/', component: Mapp, name: 'home' },
+		{ path: '/account', component: Provider, name: 'account' },
+		{ path: '/events', component: Events, name: 'events' },
+		{ path: '/urgent-needs', component: UrgentNeeds, name: 'urgentneeds' },
+		{ path: '/faq', component: Faq, name: 'faq' },
+	]
+
+const router = new VueRouter({
+	routes,
+	mode: 'history'
+});
+
 new Vue({
   el: '#app',
+  router,
   render: h => h(App),
   http: {
   	emulateJSON: true,
