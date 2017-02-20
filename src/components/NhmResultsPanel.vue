@@ -96,7 +96,7 @@
 	    </div>
 
 	    <div class="search-results">
-	      <div v-show="results.length > 0" class="row">
+	      <div v-show="results.length > 0 && resourceType === 'resources'" class="row">
 	        <em>{{results.length}} organizations found</em><br/>
 			<ul v-for="provider in results" class="collection">
 			    <li v-for="location in provider.locations" class="collection-item avatar">
@@ -108,6 +108,25 @@
 			        	{{ location.address1 }}<br/>
 			        	<span v-if="location.address2">{{ location.address2 }} -->
 			        	{{ location.zip }}
+			      	</p>
+			      <!-- <a href="#!" class="secondary-content"><i class="material-icons">grade</i></a> -->
+			    </li>
+			</ul>
+	      </div>
+
+	      <div v-show="results.length > 0 && resourceType === 'events'" class="row">
+	        <em>{{results.length}} events found</em><br/>
+			<ul class="collection">
+			    <li v-for="event in results" class="collection-item avatar event">
+		      		<span class="event-date">
+						<span class="month">{{event.event_month}}</span>
+						<span class="day-of">{{event.event_day_of_month}}</span>
+		      		</span>
+		      		<span class="title" @click="doEventClicked(event)">{{ event.title }}</span>
+			      	<p>
+			      		<span class="time">{{ event.event_starttime }}</span>
+			        	<span v-if="event.event_url">{{ event.event_url }}</span> <br/>
+			        	<span class="host">by {{ event.event_host }}</span>
 			      	</p>
 			      <!-- <a href="#!" class="secondary-content"><i class="material-icons">grade</i></a> -->
 			    </li>
@@ -271,6 +290,10 @@
 			doProviderClicked(provider, location) {
 				console.log('provider clicked: ' + provider.name + ' ' + location.name);
 				this.$emit('popup-provider', provider.id, location);
+			},
+			doEventClicked(event) {
+				console.log('event clicked: ' + event.title + ' ' + event.event_starttime);
+				this.$emit('popup-event', event.id);
 			}
 		},
 		directives: {
@@ -318,6 +341,37 @@
 		font-size: 0.88em !important;
 		font-weight: 600 !important;
 		cursor: pointer;
+	}
+	.collection-item.event .time {
+		font-size: 600;
+	}
+
+	.collection-item.event .event-date {
+		display: inline-block;
+		background-color: #23A1CB;
+		color: #ffffff;
+		position: absolute;
+		left: 10px;
+		padding: 6px 12px;
+		border-radius: 5px;
+	}
+
+	.collection-item.event .event-date .month {
+		font-size: 0.85em;
+		text-align: center;
+		display: block;
+		color: #ffffff;
+		font-weight: 400;
+	}
+	.collection-item.event .event-date .day-of {
+		font-size: 1.45em;
+		text-align: center;
+		display: block;
+		color: #ffffff;
+		font-weight: 500;
+	}
+	.collection-item.event .host {
+		opacity: 0.7;
 	}
 
 </style>

@@ -10,13 +10,13 @@
 		        <form class="col s12">
 		          <div class="row">
 		            <div class="input-field col s12">
-		              <input id="email" type="email" v-model="provider.email" class="validate">
+		              <input id="email" type="email" v-model="signin.email" class="validate">
 		              <label for="email">Email</label>
 		            </div>
 		          </div>
 		          <div class="row">
 		            <div class="input-field col s12">
-		              <input id="password" type="password" v-model="provider.pass" class="validate">
+		              <input id="password" type="password" v-model="signin.pass" class="validate">
 		              <label for="password">Password</label>
 		            </div>
 		          </div>
@@ -83,7 +83,22 @@
 	    <div v-show="!!key" class="account-menu">
 			<div class="row">
 				<div class="col s12">
-					<h5>Yay! Provider is logged in.</h5>
+					<h5>{{ provider.name }}</h5>
+					<small @click="test">Welcome!</small>
+					<div class="collection">
+				        <router-link to="/" 
+				        	class="collection-item nhm-blue"
+				        	@click.native="doRouteClicked('home')">Home</router-link> <!-- add .active -->
+				        <router-link to="/events" class="collection-item nhm-blue"
+				        	@click.native="doRouteClicked('events')">Manage Events</router-link>
+				        <router-link to="/urgent-needs" class="collection-item nhm-blue"
+				        	@click.native="doRouteClicked('urgentneeds')">Manage Urgent Needs</router-link>
+				        <router-link to="/account" class="collection-item nhm-blue"
+				        	@click.native="doRouteClicked('account')">Account</router-link>
+				        <router-link to="/faq" class="collection-item nhm-blue"
+				        	@click.native="doRouteClicked('faq')">F. A. Q.</router-link>
+				        <a href="#" class="collection-item nhm-blue" @click="doProviderSignOut">Sign Out</a>
+      				</div>
 				</div>
 			</div>
 	    </div>
@@ -97,13 +112,16 @@
 	import nhmservice from '../gateways/nhmservice';
 	require('materialize-css/dist/js/materialize');
 
+	const NHMTOKEN = 'nhmtoken';
+
 	export default {
 		name: 'nhm-login-bar',
 
 		data() {
 			return {
 				key: null,
-				provider: {
+				provider: {},
+				signin: {
 					email: null,
 					pass: null
 				},
@@ -117,6 +135,7 @@
 		},
 
 		mounted() {
+			this.key = window.localStorage.getItem(NHMTOKEN);
 			/*
 			eventBus.$on('show-login-bar', function(){
 				console.log('bus: received show-login-bar event. Showing...');
@@ -125,19 +144,31 @@
 			*/
 		},
 
+		beforeDestroy() {
+			//window.localStorage.removeItem(NHMTOKEN);
+		},
+
 		computed: {
 			enableSendRequest: function() {
 				return this.registration.organization && 
 					this.registration.email && this.registration.phone;
 			},
 			enableSignIn: function() {
-				return this.provider.email && this.provider.pass;
+				return this.signin.email && this.signin.pass;
 			}
 		},
 
 		methods: {
+			test: function() {
+				console.log('testing router...');
+				//this.$router.push('/');
+			},
 			showPanel: function(param) {
 
+			},
+			doRouteClicked: function(name) {
+				//console.log('start event...route-clicked...')
+				this.$emit('route-clicked', name);
 			},
 			doToggleLoginForm: function() {
 				this.showRegistration = !this.showRegistration;
@@ -161,7 +192,49 @@
 					});
 			},
 			doProviderSignIn: function() {
+				nhmservice.login(this, {username: this.signin.email, password: this.signin.pass})
+					.then((resp) => {
+						console.log(resp, resp.data.token);
+						this.key = resp.data.token;
+						console.log(this.key);
+						if(this.key) {
+							this.$http.headers.common['Authorization'] = 'Bearer ' + this.key;
+							window.localStorage.setItem(NHMTOKEN, this.key);
+							this.provider = { name: "Your Organization"};
+							console.log(this.provider);
+							this.signin.pass = null;
+						}
 
+						/*
+						nhmService.getProvider(this,
+									{ username: this.signin.email, password: this.signin.pass})
+							.then((data) => {
+								console.log(data);
+								this.provider = data.provider;
+							}).error((err) => {
+								console.log(err);
+								Materialize.toast('Failed to retrieve Provider account', 3000);
+							});
+						*/
+
+						// Redirect to a specified route
+						//if(redirect) {
+							//router.go(redirect)        
+						//}
+
+					}, (err) => {
+						console.log(err);
+						Materialize.toast('Login failed. Make sure your credentials are correct', 3000);
+					});
+			},
+			doProviderSignOut: function() {
+				window.localStorage.removeItem(NHMTOKEN);
+				this.$http.headers.common['Authorization'] = '';
+				this.key = null;
+
+				//redirect to the map page
+				this.$router.push('/');
+				this.doRouteClicked('home');
 			}
 		}
 	}

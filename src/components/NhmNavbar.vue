@@ -4,7 +4,7 @@
 			<a id="logo-container" href="#" class="nhm-brand-logo">
 				<img src="../assets/img/nav_logo.png" class="nhm-logo"/>
 			</a>
-			<ul class="right -hide-on-med-and-down">
+			<ul v-show="showMenu" class="right -hide-on-med-and-down">
 				<li v-for="item in menuitems">
 					<a href="#" data-activates="results-panel" class="results-panel-trigger" :data-name="item.name" @click="selectResourceType(item.name)">{{ item.display }}</a>
 				</li>
@@ -23,6 +23,13 @@
 
 	export default {
 		name: 'nhm-navbar',
+
+		props: {
+			showMenu: {
+				default: true,
+				type: Boolean
+			}
+		},
 
 		data() {
 			// your data object

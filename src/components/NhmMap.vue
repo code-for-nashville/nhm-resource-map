@@ -93,22 +93,27 @@
 				this.resourceMap.removeMarkers();
 				var renderMarkers = this.markers.map((val, idx) => {
 					//console.log(val);
-					return {
+					let marker = {
 					  lat: parseFloat(val.latitude),
 					  lng: parseFloat(val.longitude),
 					  title: val.provider_name,
-					  icon: {
-					  	scaledSize: new google.maps.Size(30, 30),
-					  	url: val.icon
-					  },
 					  click: (e) => {
-					    console.log('You clicked on ' + val.name + '!');
+					    console.log('You clicked on ' + val.item_name + '!');
 					    this.$emit('popup-provider', val.provider_id, val);
 					  },
 					  mouseover: (e) => {
 					  	Materialize.toast(val.item_name, 2600, 'rounded');
 					  }
 					};
+
+					if(val.icon) {
+						marker.icon = {
+						  	scaledSize: new google.maps.Size(30, 30),
+							url: val.icon
+						};
+					}
+
+					return marker;
 				});
 				console.log(renderMarkers);
 				this.resourceMap.addMarkers(renderMarkers);
