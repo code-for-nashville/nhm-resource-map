@@ -109,7 +109,7 @@
 			        	<span v-if="location.address2">{{ location.address2 }} -->
 			        	{{ location.zip }}
 			      	</p>
-			      <!-- <a href="#!" class="secondary-content"><i class="material-icons">grade</i></a> -->
+			      	<!-- <a href="#!" class="secondary-content"><i class="material-icons">grade</i></a> -->
 			    </li>
 			</ul>
 	      </div>
@@ -128,7 +128,27 @@
 			        	<span v-if="event.event_url">{{ event.event_url }}</span> <br/>
 			        	<span class="host">by {{ event.event_host }}</span>
 			      	</p>
-			      <!-- <a href="#!" class="secondary-content"><i class="material-icons">grade</i></a> -->
+			      	<!-- <a href="#!" class="secondary-content"><i class="material-icons">grade</i></a> -->
+			    </li>
+			</ul>
+	      </div>
+
+	      <div v-show="results.length > 0 && resourceType === 'urgent-needs'" class="row">
+	        <em>{{results.length}} urgent needs found</em><br/>
+	        <small><em>ordered by expiration time</em></small><br/>
+			<ul class="collection">
+			    <li v-for="need in results" :class="{urgent: need.time_left_units === 'hours'}" class="collection-item avatar need">
+		      		<span class="event-date">
+						<span class="time-left">{{need.time_left}}</span>
+						<span class="units">{{need.time_left_units}}</span>
+		      		</span>
+		      		<span class="title" @click="doUrgentNeedClicked(need)">{{ need.title }}</span>
+			      	<p>
+			      		<span v-if="need.start_datetime" class="time">posted on {{ need.event_month }} {{ need.event_day_of_month }}, {{ need.event_year }}</span>
+			        	<span v-if="need.event_url">{{ need.event_url }}</span> <br/>
+			        	<span class="host">by {{ need.event_host }}</span>
+			      	</p>
+			      	<!-- <a href="#!" class="secondary-content"><i class="material-icons">grade</i></a> -->
 			    </li>
 			</ul>
 	      </div>
@@ -294,6 +314,10 @@
 			doEventClicked(event) {
 				console.log('event clicked: ' + event.title + ' ' + event.event_starttime);
 				this.$emit('popup-event', event.id);
+			},
+			doUrgentNeedClicked(need) {
+				console.log('urgent need clicked: ' + need.title + ' ' + need.event_starttime);
+				this.$emit('popup-urgent-need', need.id);
 			}
 		},
 		directives: {
@@ -342,11 +366,13 @@
 		font-weight: 600 !important;
 		cursor: pointer;
 	}
-	.collection-item.event .time {
+	.collection-item.event .time,
+	.collection-item.need .time {
 		font-size: 600;
 	}
 
-	.collection-item.event .event-date {
+	.collection-item.event .event-date,
+	.collection-item.need .event-date {
 		display: inline-block;
 		background-color: #23A1CB;
 		color: #ffffff;
@@ -355,22 +381,33 @@
 		padding: 6px 12px;
 		border-radius: 5px;
 	}
-
-	.collection-item.event .event-date .month {
+	.collection-item.need .event-date {
+		background-color: orange;
+	}
+	.collection-item.need.urgent .event-date {
+		background-color: red;
+	}
+	.collection-item.need .event-date .expiry {
+		font-size: 0.75em;
+	}
+	.collection-item.event .event-date .month,
+	.collection-item.need .event-date .units {
 		font-size: 0.85em;
 		text-align: center;
 		display: block;
 		color: #ffffff;
 		font-weight: 400;
 	}
-	.collection-item.event .event-date .day-of {
+	.collection-item.event .event-date .day-of,
+	.collection-item.need .event-date .time-left {
 		font-size: 1.45em;
 		text-align: center;
 		display: block;
 		color: #ffffff;
 		font-weight: 500;
 	}
-	.collection-item.event .host {
+	.collection-item.event .host,
+	.collection-item.need .host {
 		opacity: 0.7;
 	}
 

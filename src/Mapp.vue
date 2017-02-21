@@ -126,7 +126,7 @@
                 this.results = response.data;
                 this.updateMarkers(params.resourceType);
                 //this.$set(this.services, response.data);
-                console.log('received urgent-needs into this.results[]');
+                console.log('received urgent-needs into this.results[]',this.results);
 
               }, (err) => {
                 //context.error = err;
@@ -188,6 +188,17 @@
             }
           }
         } else if(resourceType == resourceTypes.EVENTS.name) {
+          for(let i=0; i < this.results.length; i++) {
+              let t = {...this.results[i]};
+              t.provider_name = this.results[i].event_host;
+              t.longitude = this.results[i].event_coordinates[0];
+              t.latitude = this.results[i].event_coordinates[1];
+              t.provider_id = this.results[i].event_host_id;
+              t.item_name = t.title;
+              //t.icon = this.results[i].avatar || this.results[i].services[0].icon;
+              temp.push(t);
+          }
+        } else if(resourceType == resourceTypes.URGENTNEEDS.name) {
           for(let i=0; i < this.results.length; i++) {
               let t = {...this.results[i]};
               t.provider_name = this.results[i].event_host;
