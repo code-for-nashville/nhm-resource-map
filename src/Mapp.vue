@@ -1,12 +1,18 @@
 <template>
   <div id="mapp">
-    <nhm-map v-bind:markers="markers" v-on:popup-provider="doPopupProvider"></nhm-map>
+    <nhm-map v-bind:markers="markers" 
+      v-on:popup-provider="doPopupProvider"
+      v-on:popup-event="doPopupEvent"
+      v-on:popup-urgent-need="doPopupUrgentNeed"></nhm-map>
     <nhm-results-panel 
       v-on:do-search="doHandleSearch"
       v-on:clear-results="doClearResults" 
       v-on:popup-provider="doPopupProvider"
-      v-bind:results="results"></nhm-results-panel>
-    <nhm-footer></nhm-footer>
+      v-on:popup-event="doPopupEvent"
+      v-on:popup-urgent-need="doPopupUrgentNeed"
+      v-bind:results="results"
+      v-bind:services="services"
+      v-bind:resource-type="resourceType"></nhm-results-panel>
 
     <div id="mapModal" class="modal modal-close">
       <div class="card horizontal">
@@ -34,16 +40,41 @@
       </div>
     </div>
 
+    <div id="mapModal2" class="modal modal-close events">
+      <div class="card horizontal">
+        <div class="card-image">
+          <img :class="{padded: !selected_provider.avatar}" :src="getSelectedProviderAvatar">
+        </div>
+        <div class="card-stacked">
+          <div class="card-content">
+            <h5>{{ selected_provider.title }}</h5>
+            <p v-if="selected_provider.event_starttime" class="text-large">
+              <strong>{{ selected_provider.event_month }} {{ selected_provider.event_day_of_month }}</strong> at <strong>{{ selected_provider.event_starttime }}</strong><br/>
+            </p>
+            <p class="text-small">{{ selected_provider.event_address1}} <span v-if="selected_provider.address2" class="text-small">, {{ selected_provider.event_address2}}</span></p>
+            <p v-if="selected_provider.city || selected_provider.state" class="text-small">
+              {{ selected_provider.event_city}} {{ selected_provider.event_state }} {{ selected_provider.event_zip }}
+            </p>
+            
+            <p v-if="selected_provider.description">{{ selected_provider.description }}</p>
+          </div>
+          <div class="card-action">
+            <a v-if="selected_provider.event_url" :href="selected_provider.event_url" target="_blank">Visit Event Website</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </template>
 
 <script>
-  import NhmNavbar from './components/NhmNavbar'
-  import NhmLoginBar from './components/NhmLoginBar'
+  //import NhmNavbar from './components/NhmNavbar'
+  //import NhmLoginBar from './components/NhmLoginBar'
   import NhmMap from './components/NhmMap'
   import NhmResultsPanel from './components/NhmResultsPanel'
-  import NhmFooter from './components/NhmFooter'
-  import { resourceTypes } from './main'
+  //import NhmFooter from './components/NhmFooter'
+  import { resourceTypes, eventBus } from './main'
   import nhmservice from './gateways/nhmservice';
 
   require('materialize-css/dist/js/materialize');
@@ -51,13 +82,18 @@
   export default {
     name: 'mapp',
     components: {
-      NhmNavbar, NhmLoginBar, NhmMap, NhmResultsPanel, NhmFooter
+      //NhmNavbar, 
+      //NhmLoginBar, 
+      NhmMap, 
+      NhmResultsPanel, 
+      //NhmFooter
     },
     data() {
       return {
         resourceType: resourceTypes.RESOURCES.name,
         results: [],
         markers: [],
+        services: [],
         selected_provider: {},
         provider: {},
         //showNavMenu: true,
@@ -76,9 +112,33 @@
           closeOnSelect: true
       });
       $('.modal').modal();
+
+      //Register for listners
+      eventBus.$on('select-resource-type', resourceType => {
+        console.log('bus: received select-resource-type event. Showing...', resourceType);
+        if(this.resourceType !== resourceType) {
+          //console.log(this.results, this.resourceType);
+          this.doClearResults();
+          this.resourceType = resourceType;
+        }
+      });
+
+      // fetch the services
+      nhmservice.getServices(this).then((response) => {
+        this.services = response.data;
+        //this.$set(this.services, response.data);
+        //console.log('got data...', this.services);
+        eventBus.$emit('services-loaded', this.services);
+
+      }, (err) => {
+        //context.error = err;
+        console.log('whoops...error...', err);
+      });
+
     },
     updated() {
-      this.updateMarkers(this.resouceType);
+      this.updateMarkers(this.resourceType);
+      console.log('Mapp updated ...resourceType: ' + this.resourceType);
     },
     computed: {
       getSelectedProviderAvatar: function() {
@@ -100,11 +160,11 @@
                 this.results = response.data;
                 this.updateMarkers(params.resourceType);
                 //this.$set(this.services, response.data);
-                console.log('received providers into this.results[]');
+                console.log('received providers into this.results[]' + params.resourceType);
 
               }, (err) => {
                 //context.error = err;
-                console.log('whoops...error...', err);
+                console.log('whoops... resources error...', err);
               });
             break;
           case resourceTypes.EVENTS.name:
@@ -117,7 +177,7 @@
 
               }, (err) => {
                 //context.error = err;
-                console.log('whoops...error...', err);
+                console.log('whoops... events error...', err);
               });
             break;
           case resourceTypes.URGENTNEEDS.name:
@@ -130,7 +190,7 @@
 
               }, (err) => {
                 //context.error = err;
-                console.log('whoops...error...', err);
+                console.log('whoops... urgent-needs error...', err);
               });
             break;
           default:
@@ -140,7 +200,7 @@
       }, //doHandleSearch
 
       doClearResults: function() {
-        //this.results = [];
+        this.results = [];
       }, 
 
       doPopupProvider: function(provider_id, location) {
@@ -168,6 +228,42 @@
         console.log('popup-provider event heard...', provider_id);
       },
 
+      doPopupEvent: function(event_id, location) {
+        var $modal = $('#mapModal2');
+
+        //find the right event object
+        for(let p=0; p < this.results.length; p++) {
+          if(this.results[p].id === event_id) {
+            this.selected_provider = this.results[p];
+            break;
+          }
+        }
+        
+        if(this.selected_provider) {
+          $modal.modal('open');
+        }
+
+        console.log('popup-event event heard...', event_id);
+      },
+
+      doPopupUrgentNeed: function(event_id, location) {
+        var $modal = $('#mapModal2');
+
+        //find the right event object
+        for(let p=0; p < this.results.length; p++) {
+          if(this.results[p].id === event_id) {
+            this.selected_provider = this.results[p];
+            break;
+          }
+        }
+        
+        if(this.selected_provider) {
+          $modal.modal('open');
+        }
+
+        console.log('popup-urgent-need event heard...', event_id);
+      },
+
       doProviderAuthenticated: function(provider) {
         if(provider) {
           this.provider = provider;
@@ -175,6 +271,7 @@
       },
 
       updateMarkers: function(resourceType) {
+        console.log("From updateMarkers: " + resourceType);
         var temp = [];
         if (resourceType == resourceTypes.RESOURCES.name) {
           for(let i=0; i < this.results.length; i++) {
@@ -193,7 +290,7 @@
               t.provider_name = this.results[i].event_host;
               t.longitude = this.results[i].event_coordinates[0];
               t.latitude = this.results[i].event_coordinates[1];
-              t.provider_id = this.results[i].event_host_id;
+              t.provider_id = this.results[i].id;   //event_host_id;
               t.item_name = t.title;
               //t.icon = this.results[i].avatar || this.results[i].services[0].icon;
               temp.push(t);
@@ -204,7 +301,7 @@
               t.provider_name = this.results[i].event_host;
               t.longitude = this.results[i].event_coordinates[0];
               t.latitude = this.results[i].event_coordinates[1];
-              t.provider_id = this.results[i].event_host_id;
+              t.provider_id = this.results[i].id;   //event_host_id;
               t.item_name = t.title;
               //t.icon = this.results[i].avatar || this.results[i].services[0].icon;
               temp.push(t);

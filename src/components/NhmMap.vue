@@ -22,6 +22,15 @@
 		name: 'nhm-map',
 
 		data() {
+			const eventIds = {};
+			const resources = resourceTypes.RESOURCES.name;
+			const events = resourceTypes.EVENTS.name;
+			const urgentneeds = resourceTypes.URGENTNEEDS.name;
+
+			eventIds[resources] = 'popup-provider';
+			eventIds[events] = 'popup-event';
+			eventIds[urgentneeds] = 'popup-urgent-need';
+
 			return {
 				resourceType: resourceTypes.RESOURCES.name,
 				results: [],
@@ -34,6 +43,7 @@
 					urgentNeedDate: null
 				},
 				resourceMap: null,
+				eventIds
 			};
 		},
 		props: {
@@ -98,11 +108,11 @@
 					  lng: parseFloat(val.longitude),
 					  title: val.provider_name,
 					  click: (e) => {
-					    console.log('You clicked on ' + val.item_name + '!');
-					    this.$emit('popup-provider', val.provider_id, val);
+					    console.log('You clicked on ' + val.item_name + '!' + this.eventIds[this.resourceType]);
+					    this.$emit(this.eventIds[this.resourceType], val.provider_id, val);
 					  },
 					  mouseover: (e) => {
-					  	Materialize.toast(val.item_name, 2600, 'rounded');
+					  	Materialize.toast(val.item_name, 1000, 'rounded');
 					  }
 					};
 

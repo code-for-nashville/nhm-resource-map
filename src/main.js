@@ -28,10 +28,10 @@ export const resourceTypes = {
 };
 
 const routes = [
-		{ path: '/', component: Mapp, name: 'home' },
-		{ path: '/account', component: Provider, name: 'account' },
-		{ path: '/events', component: Events, name: 'events' },
-		{ path: '/urgent-needs', component: UrgentNeeds, name: 'urgentneeds' },
+		{ path: '/', component: Mapp, name: 'home', props: true },
+		{ path: '/account/:id', component: Provider, name: 'account', props: true },
+		{ path: '/events/:id', component: Events, name: 'events', props: true },
+		{ path: '/urgent-needs/:id', component: UrgentNeeds, name: 'urgentneeds', props: true },
 		{ path: '/faq', component: Faq, name: 'faq' },
 	]
 
@@ -46,7 +46,7 @@ new Vue({
   render: h => h(App),
   http: {
   	emulateJSON: true,
-    emulateHTTP: true
+    //emulateHTTP: true
   }
 });
 

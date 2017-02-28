@@ -4,12 +4,14 @@
     <nhm-login-bar v-on:provider-authenticated="doProviderAuthenticated"
                     v-on:route-clicked="doRouteClicked"></nhm-login-bar>
     <router-view></router-view>
+    <nhm-footer></nhm-footer>
   </div>
 </template>
 
 <script>
   import NhmNavbar from './components/NhmNavbar'
   import NhmLoginBar from './components/NhmLoginBar'
+  import NhmFooter from './components/NhmFooter'
   import { resourceTypes } from './main'
   import nhmservice from './gateways/nhmservice';
 
@@ -18,7 +20,7 @@
   export default {
     name: 'app',
     components: {
-      NhmNavbar, NhmLoginBar
+      NhmNavbar, NhmLoginBar, NhmFooter
     },
     data() {
       return {
@@ -61,7 +63,9 @@
         //$('.login-panel-trigger').sideNav('show');
       },
       doProviderAuthenticated: function() {
-        console.log('provider authenticated in top App')
+        console.log('provider authenticated in top App');
+        //get provider ...and pass it down to Provider, Event, and UrgentNeed components
+        
       },
       doRouteClicked: function(name) {
         console.log('route-clicked...', name);
@@ -70,6 +74,10 @@
         } else {
           this.showNavMenu = false;
         }
+        $('.login-panel-trigger').sideNav('hide');
+      },
+      doServicesLoaded: function(services) {
+
       }
 
     } //methods

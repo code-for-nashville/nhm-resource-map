@@ -165,7 +165,6 @@
 
 <script>
 	import { eventBus, resourceTypes } from '../main';
-	import nhmservice from '../gateways/nhmservice';
 	require('materialize-css/dist/js/materialize');
 
 	//console.log(resourceTypes);
@@ -175,8 +174,8 @@
 
 		data() {
 			return {
-				resourceType: resourceTypes.RESOURCES.name,
-				services: [],
+				//resourceType: resourceTypes.RESOURCES.name,
+				//services: [],
 				search: null,
 				startDate: null,
 				endDate: null,
@@ -188,6 +187,16 @@
 			results: {
 				type: Array,
 				default: [], 
+				required: false
+			},
+			resourceType: {
+				type: String,
+				default: 'resources',
+				required: true
+			},
+			services: {
+				type: Array,
+				default: [],
 				required: false
 			}
 		},
@@ -203,31 +212,15 @@
 
 		    // Register to listen on eventBus
 			eventBus.$on('select-resource-type', resourceType => {
-				//console.log('bus: received select-resource-type event. Showing...', resourceType);
-				
-				this.resourceType = resourceType;
 				Materialize.updateTextFields();  //update the text fields
-
-				//console.log(this.results, this.resourceType);
-				this.$emit('clear-results');
 			});
 
 			console.log("NhmResultsPanel mounted", this.services);
-
-			// fetch the services
-			nhmservice.getServices(this).then((response) => {
-				this.services = response.data;
-				//this.$set(this.services, response.data);
-				//console.log('got data...', this.services);
-
-			}, (err) => {
-				//context.error = err;
-				console.log('whoops...error...', err);
-			});
 		},
 
 		updated() {
 			$('select:not([multiple])').material_select();
+			console.log("NhmResultsPanel updated...");
 		},
 		computed: {
 			resourceTypeAsTitle: function() {

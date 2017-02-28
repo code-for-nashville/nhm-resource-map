@@ -1,7 +1,10 @@
 <template>
 	<nav id="main-nav" class="nhm-dark-blue" role="navigation">
 		<div class="nav-wrapper container">
-			<a id="logo-container" href="#" class="nhm-brand-logo">
+			<a href="#" data-activates="login-panel" class="login-panel-trigger">
+				<i class="material-icons">menu</i>
+			</a>
+			<a id="logo-container" href="#" data-activates="login-panel" class="nhm-brand-logo login-panel-trigger">
 				<img src="../assets/img/nav_logo.png" class="nhm-logo"/>
 			</a>
 			<ul v-show="showMenu" class="right -hide-on-med-and-down">
@@ -9,9 +12,6 @@
 					<a href="#" data-activates="results-panel" class="results-panel-trigger" :data-name="item.name" @click="selectResourceType(item.name)">{{ item.display }}</a>
 				</li>
 			</ul>
-			<a href="#" data-activates="login-panel" class="login-panel-trigger">
-				<i class="material-icons">menu</i>
-			</a>
 		</div>
 	</nav>
 </template>

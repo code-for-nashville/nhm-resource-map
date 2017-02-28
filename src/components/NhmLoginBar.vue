@@ -83,7 +83,7 @@
 	    <div v-show="!!key" class="account-menu">
 			<div class="row">
 				<div class="col s12">
-					<h5>{{ provider.name }}</h5>
+					<p align="center"><strong>{{ provider.name }}</strong></p>
 					<small @click="test">Welcome!</small>
 					<div class="collection">
 				        <router-link to="/" 
@@ -93,7 +93,7 @@
 				        	@click.native="doRouteClicked('events')">Manage Events</router-link>
 				        <router-link to="/urgent-needs" class="collection-item nhm-blue"
 				        	@click.native="doRouteClicked('urgentneeds')">Manage Urgent Needs</router-link>
-				        <router-link to="/account" class="collection-item nhm-blue"
+				        <router-link :to="accountRoute" class="collection-item nhm-blue"
 				        	@click.native="doRouteClicked('account')">Account</router-link>
 				        <router-link to="/faq" class="collection-item nhm-blue"
 				        	@click.native="doRouteClicked('faq')">F. A. Q.</router-link>
@@ -113,6 +113,7 @@
 	require('materialize-css/dist/js/materialize');
 
 	const NHMTOKEN = 'nhmtoken';
+	const NHMPROVIDERID = 'nhmproviderid';
 
 	export default {
 		name: 'nhm-login-bar',
@@ -120,7 +121,7 @@
 		data() {
 			return {
 				key: null,
-				provider: {},
+				provider: { id: null },
 				signin: {
 					email: null,
 					pass: null
@@ -136,6 +137,13 @@
 
 		mounted() {
 			this.key = window.localStorage.getItem(NHMTOKEN);
+			this.provider.id = window.localStorage.getItem(NHMPROVIDERID);
+
+			this.$http.headers.common['Authorization'] = 'Token ' + this.key;
+
+			if(this.provider.id) {
+				this.$emit('provider-authenticated', this.provider.id);
+			}
 			/*
 			eventBus.$on('show-login-bar', function(){
 				console.log('bus: received show-login-bar event. Showing...');
@@ -155,6 +163,9 @@
 			},
 			enableSignIn: function() {
 				return this.signin.email && this.signin.pass;
+			},
+			accountRoute: function() {
+				return '/account/' + this.provider.id;
 			}
 		},
 
@@ -198,11 +209,17 @@
 						this.key = resp.data.token;
 						console.log(this.key);
 						if(this.key) {
-							this.$http.headers.common['Authorization'] = 'Bearer ' + this.key;
+							this.$http.headers.common['Authorization'] = 'Token ' + this.key;
 							window.localStorage.setItem(NHMTOKEN, this.key);
-							this.provider = { name: "Your Organization"};
+							this.provider = {
+								user_id: resp.data.user_id,
+								id: resp.data.provider_id,
+								name: resp.data.provider_name
+							};
+							window.localStorage.setItem(NHMPROVIDERID, this.provider.id);
 							console.log(this.provider);
 							this.signin.pass = null;
+							this.$emit('provider-authenticated', this.provider.id);
 						}
 
 						/*
@@ -229,6 +246,7 @@
 			},
 			doProviderSignOut: function() {
 				window.localStorage.removeItem(NHMTOKEN);
+				window.localStorage.removeItem(NHMPROVIDERID);
 				this.$http.headers.common['Authorization'] = '';
 				this.key = null;
 

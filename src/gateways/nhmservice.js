@@ -7,6 +7,7 @@ const API_URL = 'http://127.0.0.1:8000/resources/'
 const BASE_URL = 'http://127.0.0.1:8000/'
 const LOGIN_URL = BASE_URL + 'account/authenticate/'
 const SIGNUP_URL = BASE_URL + 'account/register/'
+const FILE_UPLOAD_URL = BASE_URL + 'account/media-push/'
 
 export default {
 	// User object will let us check authentication status
@@ -105,8 +106,133 @@ export default {
 		return context.$http.get(endpoint);
 	},
 
-	getProvider(context, params) {
-		const endpoint = API_URL + 'providers/';
+	getProvider(context, id) {
+		const endpoint = API_URL + 'providers/' + id;
 		return context.$http.get(endpoint);
+	},
+
+	updateProvider(context, provider) {
+		let params = Object.assign({}, provider);
+		delete params.locations;
+		delete params.services;
+		const key = window.localStorage.getItem('nhmtoken');
+		//console.log(key);
+
+		const endpoint = API_URL + 'providers/' + params.id;
+		return context.$http.patch(endpoint, params, {
+			headers: {
+				Authorization: 'Token ' + key
+			}
+		});
+	},
+
+	updateProviderServices(context, provider) {
+		//provider = { id: #, services: [] }
+		let params = Object.assign({}, provider);
+		const key = window.localStorage.getItem('nhmtoken');
+
+		const endpoint = API_URL + 'providers/' + params.id;
+		return context.$http.patch(endpoint, params, {
+			headers: {
+				Authorization: 'Token ' + key,
+				'Content-Type': 'application/json'
+			},
+			emulateJSON: false
+		});
+	},
+
+	addProviderLocation(context, provider) {
+		//provider = { id: #, location: [] }
+		var self = this;
+		let params = Object.assign({}, provider);
+		const key = window.localStorage.getItem('nhmtoken');
+		const locationEndpoint = API_URL + 'locations/';
+		//const providerEndpoint = API_URL + 'providers/' + params.id;
+
+		return context.$http.post(locationEndpoint, params.location, {
+			headers: {
+				Authorization: 'Token ' + key,
+				'Content-Type': 'application/json'
+			},
+			emulateJSON: false
+		}).then((response) => {
+			var location = response.data;
+			console.log("location in service: ", location);
+			return self.updateProviderLocations(context, {id: params.id, locations: [location]}, {
+				headers: {
+					Authorization: 'Token ' + key,
+					'Content-Type': 'application/json'
+				},
+				emulateJSON: false
+			});
+		});
+	},
+
+	updateProviderLocations(context, provider) {
+		//provider = { id: #, locations: [] }
+		let params = Object.assign({}, provider);
+		const key = window.localStorage.getItem('nhmtoken');
+
+		const endpoint = API_URL + 'providers/' + params.id;
+		return context.$http.patch(endpoint, params, {
+			headers: {
+				Authorization: 'Token ' + key,
+				'Content-Type': 'application/json'
+			},
+			emulateJSON: false
+		});
+	},
+
+	deleteLocation(context, options) {
+		//options = { id: #, location: [] }
+		var self = this;
+		let params = Object.assign({}, options);
+		const key = window.localStorage.getItem('nhmtoken');
+		const locationEndpoint = API_URL + 'locations/' + params.location.id;
+		//const providerEndpoint = API_URL + 'providers/' + params.id;
+
+		return context.$http.delete(locationEndpoint, {
+			headers: {
+				Authorization: 'Token ' + key,
+				'Content-Type': 'application/json'
+			},
+			emulateJSON: false
+		}).then((response) => {
+			var deletedLocation = response.data;
+			console.log("location in service: ", deletedLocation);
+			return self.getProvider(context, params.id);
+		});
+	},
+
+	uploadMediaFile(context, provider_id, formdata) {
+		var self = this;
+		const endpoint = FILE_UPLOAD_URL;  
+		const key = window.localStorage.getItem('nhmtoken');
+
+		return context.$http.post(endpoint, formdata, {
+			headers: {
+				Authorization: 'Token ' + key,
+				'Content-Type': 'application/json'
+			},
+		}).then( (response) => { 
+			console.log("looks like uploaded went ok...", response.data);
+			return self.getProvider(context, provider_id);
+		});
+		
+	},
+
+	deleteLogo(context, provider_id) {
+		//let params = Object.assign({}, provider);
+		//delete params.locations;
+		//delete params.services;
+		const key = window.localStorage.getItem('nhmtoken');
+		//console.log(key);
+
+		const endpoint = API_URL + 'providers/' + provider_id;
+		return context.$http.patch(endpoint, {id: provider_id, avatar: ''}, {
+			headers: {
+				Authorization: 'Token ' + key
+			}
+		});
 	},
 }
