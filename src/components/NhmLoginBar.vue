@@ -89,10 +89,10 @@
 				        <router-link to="/" 
 				        	class="collection-item nhm-blue"
 				        	@click.native="doRouteClicked('home')">Home</router-link> <!-- add .active -->
-				        <router-link to="/events" class="collection-item nhm-blue"
-				        	@click.native="doRouteClicked('events')">Manage Events</router-link>
+				        <router-link :to="eventsRoute" class="collection-item nhm-blue"
+				        	@click.native="doRouteClicked('events')">Post an Event</router-link>
 				        <router-link to="/urgent-needs" class="collection-item nhm-blue"
-				        	@click.native="doRouteClicked('urgentneeds')">Manage Urgent Needs</router-link>
+				        	@click.native="doRouteClicked('urgentneeds')">Post an Urgent Needs</router-link>
 				        <router-link :to="accountRoute" class="collection-item nhm-blue"
 				        	@click.native="doRouteClicked('account')">Account</router-link>
 				        <router-link to="/faq" class="collection-item nhm-blue"
@@ -166,6 +166,9 @@
 			},
 			accountRoute: function() {
 				return '/account/' + this.provider.id;
+			},
+			eventsRoute: function() {
+				return '/events/' + this.provider.id;
 			}
 		},
 
