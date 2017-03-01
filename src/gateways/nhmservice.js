@@ -235,4 +235,36 @@ export default {
 			}
 		});
 	},
+
+	getEvents(context, provider_id) {
+		//const key = window.localStorage.getItem('nhmtoken');
+		const endpoint = API_URL + 'events/?provider=' + provider_id;
+		return context.$http.get(endpoint);
+	},
+
+	createEvent(context, event) {
+		const key = window.localStorage.getItem('nhmtoken');
+		//console.log(key);
+
+		const endpoint = API_URL + 'events/';
+		return context.$http.post(endpoint, event, {
+			headers: {
+				Authorization: 'Token ' + key
+			}
+		});
+	},
+
+	deleteEvent(context, event_id) {
+		//options = { id: #, location: [] }
+		const key = window.localStorage.getItem('nhmtoken');
+		const endpoint = API_URL + 'events/' + event_id;
+
+		return context.$http.delete(endpoint, {
+			headers: {
+				Authorization: 'Token ' + key,
+				'Content-Type': 'application/json'
+			},
+			emulateJSON: false
+		});
+	},
 }
