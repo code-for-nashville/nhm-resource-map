@@ -142,6 +142,9 @@
 							<strong class="subheading">Your events</strong><br/>
 							Here are your recently posted events <em>(limit 10)</em>
 						</p>
+						<p v-show="events.length < 1">
+							<strong>You have no recent events posted</strong>
+						</p>
 		        	</div>
 		        	<div class="row">
 						<!-- List events here... -->

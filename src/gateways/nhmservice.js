@@ -267,4 +267,36 @@ export default {
 			emulateJSON: false
 		});
 	},
+
+	getNeeds(context, provider_id) {
+		//const key = window.localStorage.getItem('nhmtoken');
+		const endpoint = API_URL + 'urgent-needs/?provider=' + provider_id;
+		return context.$http.get(endpoint);
+	},
+
+	createNeed(context, need) {
+		const key = window.localStorage.getItem('nhmtoken');
+		//console.log(key);
+
+		const endpoint = API_URL + 'urgent-needs/';
+		return context.$http.post(endpoint, need, {
+			headers: {
+				Authorization: 'Token ' + key
+			}
+		});
+	},
+
+	deleteNeed(context, need_id) {
+		//options = { id: #, location: [] }
+		const key = window.localStorage.getItem('nhmtoken');
+		const endpoint = API_URL + 'urgent-needs/' + need_id;
+
+		return context.$http.delete(endpoint, {
+			headers: {
+				Authorization: 'Token ' + key,
+				'Content-Type': 'application/json'
+			},
+			emulateJSON: false
+		});
+	},
 }
