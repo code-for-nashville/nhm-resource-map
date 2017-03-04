@@ -4,6 +4,11 @@
       v-on:popup-provider="doPopupProvider"
       v-on:popup-event="doPopupEvent"
       v-on:popup-urgent-need="doPopupUrgentNeed"></nhm-map>
+    <div class="bookmark-button">
+      <a class="btn-floating btn-large waves-effect waves-light red tooltipped" data-position="left" data-tooltip="Bookmark this search for sharing" @click.prevent="showBookmarkModal">
+        <i class="material-icons">turned_in_out</i>
+      </a>
+    </div>
     <nhm-results-panel 
       v-on:do-search="doHandleSearch"
       v-on:clear-results="doClearResults" 
@@ -13,7 +18,8 @@
       v-bind:results="results"
       v-bind:services="services"
       v-bind:clienttypes="clienttypes"
-      v-bind:resource-type="resourceType"></nhm-results-panel>
+      v-bind:resource-type="resourceType"
+      v-bind:bookmarkedSearch="currentQuery"></nhm-results-panel>
 
     <div id="mapModal" class="modal modal-close">
       <div class="card horizontal">
@@ -78,6 +84,18 @@
       </div>
     </div>
 
+    <!-- Share/Bookmark Search Link -->
+    <div id="bookmarkModal" class="modal modal-close">
+        <div class="modal-content">
+          <h5>Share or bookmark this search?</h5>
+          <p>Use the link below to bookmark or share this search.</strong>  You can copy the link below and share it via social media or email.  The results of this search will be saved retrievable at this link:</p>
+          <p align="center"><strong class="nhm-grey">{{ getBookmarkLink }}</strong></p>
+        </div>
+        <div class="modal-footer">
+          <a class=" modal-action modal-close waves-effect waves-green btn-flat">DONE</a>
+        </div>
+    </div>
+
   </div>
 </template>
 
@@ -110,6 +128,8 @@
         clienttypes: [],
         selected_provider: {},
         provider: {},
+        currentQuery: {},
+        currentBookmark: null,
         //showNavMenu: true,
       };
     },
@@ -140,7 +160,6 @@
       // fetch the services
       nhmservice.getServices(this).then((response) => {
         this.services = response.data;
-        //this.$set(this.services, response.data);
         //console.log('got data...', this.services);
         eventBus.$emit('services-loaded', this.services);
 
@@ -159,6 +178,19 @@
         console.log('whoops...error...', err);
       });
 
+      // check if there's a q parameter which means we should autoexecute a bookmarked search
+      if(this.$route.query && this.$route.query.q) {
+        nhmservice.decodeBookmark(this, this.$route.query.q).then((response) => {
+          this.currentQuery = response.data;
+          console.log("decoded a bookmark (q parameter): " + this.$route.query.q + ", into -->", this.currentQuery);
+          this.doHandleSearch(this.currentQuery);
+
+        }, (err) => {
+          //context.error = err;
+          console.log('whoops...error...', err);
+        });
+      }
+
     },
     updated() {
       this.updateMarkers(this.resourceType);
@@ -170,12 +202,17 @@
           return this.selected_provider.avatar ? this.selected_provider.avatar : this.selected_provider.services[0].icon;
         }
         return "/static/img/mhrc_logo.png";
+      },
+
+      getBookmarkLink: function() {
+        return window.location.protocol + '//' + window.location.host + '?q=' + this.currentBookmark;
       }
     },
     methods: {
       doHandleSearch: function(params) {
         console.log('handling do-search', params);
         let webservice;
+        this.currentQuery = params;
 
         switch(params.resourceType) {
           case resourceTypes.RESOURCES.name:
@@ -183,9 +220,6 @@
               .then((response) => {
                 this.results = response.data;
                 this.updateMarkers(params.resourceType);
-                //this.$set(this.services, response.data);
-                //console.log('received providers into this.results[]' + params.resourceType);
-
               }, (err) => {
                 //context.error = err;
                 console.log('whoops... resources error...', err);
@@ -196,7 +230,6 @@
               .then((response) => {
                 this.results = response.data;
                 this.updateMarkers(params.resourceType);
-                //this.$set(this.services, response.data);
                 //console.log('received events into this.results[]');
 
               }, (err) => {
@@ -209,7 +242,6 @@
               .then((response) => {
                 this.results = response.data;
                 this.updateMarkers(params.resourceType);
-                //this.$set(this.services, response.data);
                 //console.log('received urgent-needs into this.results[]',this.results);
 
               }, (err) => {
@@ -220,6 +252,15 @@
           default:
             break;
         }
+
+        // regenerate currentBookmark for this currentQuery
+        nhmservice.encodeBookmark(this, this.currentQuery).then((response) => {
+          this.currentBookmark = response.data && response.data.bookmark;
+          console.log('created new currentBookmark for currentQuery: ' + this.currentBookmark);
+        }, (err) => {
+          //context.error = err;
+          console.log('whoops...error...', err);
+        });
 
       }, //doHandleSearch
 
@@ -292,6 +333,11 @@
         if(provider) {
           this.provider = provider;
         }
+      },
+
+      showBookmarkModal: function() {
+        var $modal = $('#bookmarkModal');
+        $modal.modal('open');
       },
 
       updateMarkers: function(resourceType) {
@@ -369,7 +415,20 @@
     padding-left: 14px;
   }
 
+  .bookmark-button {
+    position: absolute;
+    bottom: 50px;
+    right: 20px;
+  }
+
+  .bookmark-button .btn-floating i {
+    width: 25px;
+  }
+
   /*  Generics  */
+  .nhm-grey {
+    color: #777;
+  }
   .nhm-dark-blue {
     background-color: #282C35;
   }

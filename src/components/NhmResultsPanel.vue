@@ -93,7 +93,7 @@
 	                <option value="" selected>Choose a client type</option>
 	                <option v-for="ctype in clienttypes" :value="ctype.id" class="">{{ctype.name}}</option>
 	              </select>
-	              <label for="service">Client Type</label>
+	              <label for="clienttype">Client Type</label>
 	            </div>
 
 	            <div class="input-field col s12">
@@ -216,6 +216,11 @@
 				type: Array,
 				default: [],
 				required: false
+			},
+			bookmarkedSearch: {
+				type: Object,
+				default: {},
+				required: false
 			}
 		},
 		created() {
@@ -237,6 +242,14 @@
 			console.log("NhmResultsPanel mounted", this.services);
 
 			//on first mount...jus trigger a broad search
+			if(this.bookmarkedSearch) {
+				this.search = this.bookmarkedSearch.search || null,
+				this.startDate = this.bookmarkedSearch.startDate || null,
+				this.endDate = this.bookmarkedSearch.endDate || null,
+				this.urgentNeedDate = this.bookmarkedSearch.urgentNeedDate || null,
+				this.selected_service = this.bookmarkedSearch.service || null,
+				this.selected_clienttype = this.bookmarkedSearch.clienttype || null
+			}
 			this.doTriggerSearch();
 		},
 

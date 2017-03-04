@@ -3,10 +3,10 @@
 //import {router} from '../main'
 
 // URL and endpoint constants
-//const API_URL = 'http://127.0.0.1:8000/resources/';
-//const BASE_URL = 'http://127.0.0.1:8000/';
-const API_URL = 'http://104.236.119.135/resources/'
-const BASE_URL = 'http://104.236.119.135/'
+const API_URL = 'http://127.0.0.1:8000/resources/';
+const BASE_URL = 'http://127.0.0.1:8000/';
+//const API_URL = 'http://104.236.119.135/resources/'
+//const BASE_URL = 'http://104.236.119.135/'
 
 const LOGIN_URL = BASE_URL + 'account/authenticate/';
 const SIGNUP_URL = BASE_URL + 'account/register/';
@@ -328,5 +328,33 @@ export default {
 			},
 			emulateJSON: false
 		});
+	},
+
+	decodeBookmark(context, bookmark) {
+		var self = this;
+		const endpoint = BASE_URL + 'decode-bookmark/';  
+		const key = window.localStorage.getItem('nhmtoken');
+
+		return context.$http.post(endpoint, {bookmark: bookmark}, {
+			headers: {
+				Authorization: 'Token ' + key,
+				'Content-Type': 'application/json'
+			},
+		});
+		
+	},
+
+	encodeBookmark(context, params) {
+		var self = this;
+		const endpoint = BASE_URL + 'encode-bookmark/';
+		const key = window.localStorage.getItem('nhmtoken');
+
+		return context.$http.post(endpoint, {params: params}, {
+			headers: {
+				Authorization: 'Token ' + key,
+				'Content-Type': 'application/json'
+			},
+		});
+		
 	},
 }

@@ -100,15 +100,15 @@
 	                  </div>
 	                  <div class="input-field col s12 m4">
 	                    <input id="volunteer_contact_name" type="text" v-model="provider.volunteer_contact_name" class="validate" name="volunteer_contact_name">
-	                    <label for="facebook">Fullname</label>
+	                    <label for="facebook">Contact Fullname</label>
 	                  </div>
 	                  <div class="input-field col s12 m4">
 	                    <input id="volunteer_contact_email" type="text" v-model="provider.volunteer_contact_email" class="validate" name="volunteer_contact_email">
-	                    <label for="facebook">Email</label>
+	                    <label for="facebook">Contact Email</label>
 	                  </div>
 	                  <div class="input-field col s12 m4">
 	                    <input id="volunteer_contact_phone" type="text" v-model="provider.volunteer_contact_phone" class="validate" name="volunteer_contact_phone">
-	                    <label for="facebook">Phone</label>
+	                    <label for="facebook">Contact Phone</label>
 	                  </div>
 	                  <div class="divider"></div>
 	                </div>
