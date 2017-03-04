@@ -169,7 +169,7 @@
 
 <script>
 
-	import { resourceTypes, eventBus } from './main'
+	import { resourceTypes, eventBus } from './components/helpers'
   	import nhmservice from './gateways/nhmservice';
   	require('materialize-css/dist/js/materialize');
 

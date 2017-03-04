@@ -3,11 +3,15 @@
 //import {router} from '../main'
 
 // URL and endpoint constants
-const API_URL = 'http://127.0.0.1:8000/resources/'
-const BASE_URL = 'http://127.0.0.1:8000/'
-const LOGIN_URL = BASE_URL + 'account/authenticate/'
-const SIGNUP_URL = BASE_URL + 'account/register/'
-const FILE_UPLOAD_URL = BASE_URL + 'account/media-push/'
+//const API_URL = 'http://127.0.0.1:8000/resources/';
+//const BASE_URL = 'http://127.0.0.1:8000/';
+const API_URL = 'http://104.236.119.135/resources/'
+const BASE_URL = 'http://104.236.119.135/'
+
+const LOGIN_URL = BASE_URL + 'account/authenticate/';
+const SIGNUP_URL = BASE_URL + 'account/register/';
+const FILE_UPLOAD_URL = BASE_URL + 'account/media-push/';
+const UPDATE_CREDENTIALS_URL = BASE_URL + 'account/credentials-update/';
 
 export default {
 	// User object will let us check authentication status
@@ -74,10 +78,18 @@ export default {
 		return context.$http.get(endpoint);
 	},
 
+	getClientTypes(context) {
+		const endpoint = API_URL + 'client-types/';
+		return context.$http.get(endpoint);
+	},
+
 	searchResources(context, params) {
 		let endpoint = API_URL + 'providers?search=' + (params.search ? params.search: '');
 		if(params.service && parseInt(params.service)) {
 			endpoint += '&service=' + params.service;
+		}
+		if(params.clienttype && parseInt(params.clienttype)) {
+			endpoint += '&clienttype=' + params.clienttype;
 		}
 		return context.$http.get(endpoint);
 	},
@@ -111,10 +123,28 @@ export default {
 		return context.$http.get(endpoint);
 	},
 
+	updatePassword(context, provider_id, passdata) {
+		var self = this;
+		const endpoint = UPDATE_CREDENTIALS_URL;  
+		const key = window.localStorage.getItem('nhmtoken');
+
+		passdata.provider = provider_id;
+
+		return context.$http.post(endpoint, passdata, {
+			headers: {
+				Authorization: 'Token ' + key,
+				'Content-Type': 'application/json'
+			},
+		});
+		
+	},
+
 	updateProvider(context, provider) {
 		let params = Object.assign({}, provider);
 		delete params.locations;
 		delete params.services;
+		delete params.client_types;
+		delete params.avatar;
 		const key = window.localStorage.getItem('nhmtoken');
 		//console.log(key);
 
@@ -127,7 +157,7 @@ export default {
 	},
 
 	updateProviderServices(context, provider) {
-		//provider = { id: #, services: [] }
+		//provider = { id: #, services: [], client_types: [] }
 		let params = Object.assign({}, provider);
 		const key = window.localStorage.getItem('nhmtoken');
 

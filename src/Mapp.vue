@@ -12,6 +12,7 @@
       v-on:popup-urgent-need="doPopupUrgentNeed"
       v-bind:results="results"
       v-bind:services="services"
+      v-bind:clienttypes="clienttypes"
       v-bind:resource-type="resourceType"></nhm-results-panel>
 
     <div id="mapModal" class="modal modal-close">
@@ -30,7 +31,19 @@
             <p>
               <strong>{{ selected_provider.phone }}</strong><br/>
             </p>
-            <p v-if="selected_provider.description">{{ selected_provider.description }}</p>
+            <p v-if="selected_provider.description">{{ selected_provider.description }}</p><br/>
+            <div class="row">
+              <p class="col s6">
+                <strong>Services</strong><br/>
+                <span v-for="srvc in selected_provider.services">{{srvc.name}}<br/></span>
+                <span v-if="!(selected_provider.services && selected_provider.services.length)">No services information provided</span>
+              </p>
+              <p class="col s6">
+                <strong>Client Types</strong><br/>
+                <span v-for="ctype in selected_provider.client_types">{{ctype.name}}<br/></span>
+                <span v-if="!(selected_provider.client_types && selected_provider.client_types.length)">No client information provided</span>
+              </p>
+            </div>
           </div>
           <div class="card-action">
             <a v-if="selected_provider.website" :href="selected_provider.website" target="_blank">Visit Website</a>
@@ -74,7 +87,7 @@
   import NhmMap from './components/NhmMap'
   import NhmResultsPanel from './components/NhmResultsPanel'
   //import NhmFooter from './components/NhmFooter'
-  import { resourceTypes, eventBus } from './main'
+  import { resourceTypes, eventBus } from './components/helpers'
   import nhmservice from './gateways/nhmservice';
 
   require('materialize-css/dist/js/materialize');
@@ -94,6 +107,7 @@
         results: [],
         markers: [],
         services: [],
+        clienttypes: [],
         selected_provider: {},
         provider: {},
         //showNavMenu: true,
@@ -115,7 +129,7 @@
 
       //Register for listners
       eventBus.$on('select-resource-type', resourceType => {
-        console.log('bus: received select-resource-type event. Showing...', resourceType);
+        //console.log('bus: received select-resource-type event. Showing...', resourceType);
         if(this.resourceType !== resourceType) {
           //console.log(this.results, this.resourceType);
           this.doClearResults();
@@ -135,10 +149,20 @@
         console.log('whoops...error...', err);
       });
 
+      // fetch the client types
+      nhmservice.getClientTypes(this).then((response) => {
+        this.clienttypes = response.data;
+        eventBus.$emit('client-types-loaded', this.clienttypes);
+
+      }, (err) => {
+        //context.error = err;
+        console.log('whoops...error...', err);
+      });
+
     },
     updated() {
       this.updateMarkers(this.resourceType);
-      console.log('Mapp updated ...resourceType: ' + this.resourceType);
+      //console.log('Mapp updated ...resourceType: ' + this.resourceType);
     },
     computed: {
       getSelectedProviderAvatar: function() {
@@ -160,7 +184,7 @@
                 this.results = response.data;
                 this.updateMarkers(params.resourceType);
                 //this.$set(this.services, response.data);
-                console.log('received providers into this.results[]' + params.resourceType);
+                //console.log('received providers into this.results[]' + params.resourceType);
 
               }, (err) => {
                 //context.error = err;
@@ -173,7 +197,7 @@
                 this.results = response.data;
                 this.updateMarkers(params.resourceType);
                 //this.$set(this.services, response.data);
-                console.log('received events into this.results[]');
+                //console.log('received events into this.results[]');
 
               }, (err) => {
                 //context.error = err;
@@ -186,7 +210,7 @@
                 this.results = response.data;
                 this.updateMarkers(params.resourceType);
                 //this.$set(this.services, response.data);
-                console.log('received urgent-needs into this.results[]',this.results);
+                //console.log('received urgent-needs into this.results[]',this.results);
 
               }, (err) => {
                 //context.error = err;
@@ -271,7 +295,7 @@
       },
 
       updateMarkers: function(resourceType) {
-        console.log("From updateMarkers: " + resourceType);
+        //console.log("From updateMarkers: " + resourceType);
         var temp = [];
         if (resourceType == resourceTypes.RESOURCES.name) {
           for(let i=0; i < this.results.length; i++) {
@@ -308,7 +332,7 @@
           }
         }
         this.markers = temp;
-        console.log('Mapp has updated markers -->', resourceType, this.markers);
+        //console.log('Mapp has updated markers -->', resourceType, this.markers);
       }
 
     } //methods
@@ -336,6 +360,9 @@
   .card.horizontal {
     margin-top: 0px;
     margin-bottom: 0px;
+  }
+  .modal .card.horizontal .card-image {
+    max-width: 25%;
   }
   .card-image img.padded {
     padding-top: 24px;

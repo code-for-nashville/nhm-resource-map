@@ -9,7 +9,7 @@
 			</a>
 			<ul v-show="showMenu" class="right -hide-on-med-and-down">
 				<li v-for="item in menuitems">
-					<a href="#" data-activates="results-panel" class="results-panel-trigger" :data-name="item.name" @click="selectResourceType(item.name)">{{ item.display }}</a>
+					<a href="#" data-activates="results-panel" :class="{'nhm-blue': checkActive(item.id)}" class="results-panel-trigger" :data-name="item.name" @click="selectResourceType(item.name, item.id)">{{ item.display }}</a>
 				</li>
 			</ul>
 		</div>
@@ -17,7 +17,7 @@
 </template>
 
 <script>
-	import { eventBus, resourceTypes } from '../main';
+	import { eventBus, resourceTypes } from './helpers';
 
 	require('materialize-css/dist/js/materialize');
 
@@ -34,10 +34,11 @@
 		data() {
 			// your data object
 			return {
+				itemId: 0,
 				menuitems: [ 
-					{ name: resourceTypes.RESOURCES.name, display: 'Resources'},
-					{ name: resourceTypes.EVENTS.name, display: 'Events'},
-					{ name: resourceTypes.URGENTNEEDS.name, display: 'Urgent Needs'},
+					{ id: 1, name: resourceTypes.RESOURCES.name, display: 'Resources'},
+					{ id: 2, name: resourceTypes.EVENTS.name, display: 'Events'},
+					{ id: 3, name: resourceTypes.URGENTNEEDS.name, display: 'Urgent Needs'},
 				]
 			};
 		},
@@ -62,8 +63,15 @@
 	      	console.log('login-panel-trigger was clicked!');
 	        //eventBus.$emit('show-login-bar');
 	      },
-	      selectResourceType(resourceType) {
+	      selectResourceType(resourceType, itemId) {
+	      	this.itemId = itemId;
 	      	eventBus.$emit('select-resource-type', resourceType);
+	      },
+	      checkActive(item_id) {
+	      	if(item_id === this.itemId ) {
+	      		return true;
+	      	}
+	      	return false;
 	      }
 	    }
 	}

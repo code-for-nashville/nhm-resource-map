@@ -37,11 +37,13 @@
 	          <div class="row">
 	            <div class="col s12">
 	              <ul class="tabs">
-	                <li class="tab col s4"><a class="cyan-text text-darken-1" href="#contact">Contact Information</a></li>
-	                <li class="tab col s4"><a class="cyan-text text-darken-1" href="#services">Services</a></li>
-	                <li class="tab col s4"><a class="cyan-text text-darken-1" href="#locations">Locations</a></li>
+	                <li class="tab col s3"><a class="cyan-text text-darken-1" href="#contact">Profile</a></li>
+	                <li class="tab col s3"><a class="cyan-text text-darken-1" href="#services">Services & Client Types</a></li>
+	                <li class="tab col s3"><a class="cyan-text text-darken-1" href="#locations">Locations</a></li>
+	                <li class="tab col s3"><a class="cyan-text text-darken-1" href="#credentials">Password</a></li>
 	              </ul>
 	            </div>
+
 	            <!-- Contact Info -->
 	            <div id="contact" class="col s12">
 	              <form action="#">
@@ -90,9 +92,30 @@
 	                    <input id="twitter" type="text" v-model="provider.twitter" class="validate" name="twitter">
 	                    <label for="twitter">Twitter</label>
 	                  </div>
+	                </div>
+	                <div class="row">
+	                  <div class="divider"></div>
+	                  <div class="col s12">
+						<p><strong class="text-muted text-lighten">Volunteering Contact Information</strong></p>
+	                  </div>
+	                  <div class="input-field col s12 m4">
+	                    <input id="volunteer_contact_name" type="text" v-model="provider.volunteer_contact_name" class="validate" name="volunteer_contact_name">
+	                    <label for="facebook">Fullname</label>
+	                  </div>
+	                  <div class="input-field col s12 m4">
+	                    <input id="volunteer_contact_email" type="text" v-model="provider.volunteer_contact_email" class="validate" name="volunteer_contact_email">
+	                    <label for="facebook">Email</label>
+	                  </div>
+	                  <div class="input-field col s12 m4">
+	                    <input id="volunteer_contact_phone" type="text" v-model="provider.volunteer_contact_phone" class="validate" name="volunteer_contact_phone">
+	                    <label for="facebook">Phone</label>
+	                  </div>
+	                  <div class="divider"></div>
+	                </div>
+	                <div class="row">
 	                  <div class="input-field col s12">
 	                    <button class="btn waves-effect waves-light right" 
-	                    		type="submit" @click.prevent="updateProvider" name="action">Save Information
+	                    		type="submit" @click.prevent="updateProvider" name="action">Save All Information
 	                      <i class="material-icons right">input</i>
 	                    </button>
 	                  </div>
@@ -100,20 +123,29 @@
 	              </form>
 	            </div>
 
-	            <!-- Services -->
+	            <!-- Services & Client Types -->
 	            <div id="services" class="col s12 pad-bottom">
 	              <form action="#">
 	                <div class="row pad-top">
+	                  <p class="col s12"><strong>Services Offered</strong></p>
 	                  <p v-for="service in services" class="col s12 m6">
 	                    <input type="checkbox" class="filled-in" :id="'srvc_'+service.id"
 	                    	name="services" :value="service.id" v-model="providerServices" />
 	                    <label :for="'srvc_'+service.id">{{ service.name }}</label>
 	                  </p>
 	                </div>
+	                <div class="row">
+	                  <p class="col s12"><strong>Types of Clients</strong></p>
+	                  <p v-for="ctype in clienttypes" class="col s12 m6">
+	                    <input type="checkbox" class="filled-in" :id="'ctype_'+ctype.id"
+	                    	name="clienttypes" :value="ctype.id" v-model="providerClientTypes" />
+	                    <label :for="'ctype_'+ctype.id">{{ ctype.name }}</label>
+	                  </p>
+	                </div>
 	                <div class="input-field col s12">
 	                  <button class="btn waves-effect waves-light right" 
 	                  			@click.prevent="updateProviderServices" type="submit" 
-	                  			name="action">Save Services
+	                  			name="action">Save Services & Client Types
 	                    <i class="material-icons right">input</i>
 	                  </button>
 	                </div>
@@ -195,7 +227,34 @@
 
 	                </div> <!-- /.col.s12 -->
 	              </div>
-	            </div><!-- /.row.pad-top -->
+	            </div><!-- /.locations -->
+
+	            <div id="credentials" class="col s12">
+					<div class="row pad-top">
+						<div class="col s12">
+							<form action="#">
+			                	<div class="input-field col s12">
+			                    	<input id="name" type="password" class="validate" name="old_pass" v-model="password.old" />
+			                    	<label for="name">Current Password</label>
+			                	</div>
+			                	<div class="input-field col s12">
+			                    	<input id="name" type="password" class="validate" name="new_pass" v-model="password.new" />
+			                    	<label for="name">New Password</label>
+			                	</div>
+			                	<div class="input-field col s12">
+			                    	<input id="name" type="password" class="validate" name="confirm_pass" v-model="password.confirm" />
+			                    	<label for="name">Confirm Password</label>
+			                	</div>
+			                	<div class="input-field col s12">
+		                    		<button :class="{disabled: disableChangePassword}" class="btn waves-effect waves-light right" 
+		                    		type="submit" @click.prevent="updatePassword" name="action">Change Password
+		                      			<i class="material-icons right">input</i>
+		                    		</button>
+		                  		</div>
+		                	</form>
+	                	</div>
+	                </div>
+	            </div>
 
 	          </div>
 
@@ -231,7 +290,7 @@
 </template>
 
 <script>
-	import { resourceTypes, eventBus } from './main'
+	import { resourceTypes, eventBus } from './components/helpers'
   	import nhmservice from './gateways/nhmservice';
   	require('materialize-css/dist/js/materialize');
 
@@ -240,7 +299,7 @@
 
   		data() {
   			return {
-  				provider: { id: null, services: [], locations: [] },
+  				provider: { id: null, services: [], locations: [], client_types: [] },
   				fileUploadFormData: new FormData(),
   				newLocation: {
   					name: null,
@@ -250,9 +309,16 @@
   					state: 'TN',
   					zip: null
   				},
+  				password: {
+  					old: null,
+  					new: null,
+  					confirm: null
+  				},
   				deleteLocation: {},
   				services: [],
   				providerServices: [],
+  				clienttypes: [],
+  				providerClientTypes: [],
   			};
   		},
 
@@ -307,9 +373,16 @@
 	    		this.services = services || [];
 	    		//console.log('Provider received services: ', this.services);
 	    	});
+	    	eventBus.$on('client-types-loaded', function(clienttypes) {
+	    		this.clienttypes = clienttypes || [];
+	    		//console.log('Provider received clienttypes: ', this.clienttypes);
+	    	});
 
 	    	//fetch Services
 	    	this.fetchServices();
+
+	    	//fetch ClientTypes
+	    	this.fetchClientTypes();
 
 	    	//fetch provider
 	    	this.fetchProvider();
@@ -330,6 +403,17 @@
 					return true;
 				}
 				return false;
+			},
+			disableChangePassword: function() {
+				if(!(this.password.old && this.password.new && this.password.confirm)) {
+					return true;
+				}
+
+				if(this.password.new !== this.password.confirm) {
+					return true;
+				}
+
+				return false;
 			}
 		},
 
@@ -341,6 +425,17 @@
 			        //this.$set(this.services, response.data);
 			        //console.log('got data...', this.services);
 			        eventBus.$emit('services-loaded', this.services);
+
+			      }, (err) => {
+			        //context.error = err;
+			        console.log('whoops...error...', err);
+			      });
+			},
+
+			fetchClientTypes: function() {
+				nhmservice.getClientTypes(this).then((response) => {
+			        this.clienttypes = response.data;
+			        eventBus.$emit('client-types-loaded', this.clienttypes);
 
 			      }, (err) => {
 			        //context.error = err;
@@ -362,7 +457,10 @@
 						this.providerServices = this.provider.services.map(function(item, idx) {
 				        	return item.id;
 				        });
-				        console.log('providerServices -->', this.providerServices);
+				        this.providerClientTypes = this.provider.client_types.map(function(item, idx) {
+				        	return item.id;
+				        });
+				        //console.log('providerServices -->', this.providerServices);
 
 					}, (err) => {
 						console.log('whoops...error...', err);
@@ -388,14 +486,41 @@
 
 			}, 
 
+			updatePassword: function() {
+				if(!this.id) {
+					console.log("NO Provider to update! " + this.id);
+					return;
+				}
+
+				nhmservice.updatePassword(this, this.id, this.password)
+					.then((response) => {
+						console.log(response.data);
+						if(response.data.error) {
+							Materialize.toast("Error: " + response.data.error, 3000);
+						} else {
+							Materialize.toast("Your password has been updated!", 2000);
+							this.password = {
+								old: null,
+								new: null,
+								confirm: null
+							};
+						}
+						
+					}, (err) => {
+						console.log('whoops...error...', err);
+						Materialize.toast("Unable to update your password. Please try again.", 3000);
+					});
+			},
+
 			updateProviderServices: function() {
-				//var self = this;
+				// Updates the Providers Services AND Client Types
 
 				if(!this.id) {
 					console.log("NO Provider to update! " + this.id);
 					return;
 				}
 
+				// ...do Services
 				this.provider.services = this.services.filter(function(item, idx) {
 		        	if(this.providerServices.indexOf(item.id) !== -1) {
 		        		return true;
@@ -411,16 +536,32 @@
 		        	};
 		        }.bind(this));
 
-		        console.log('provider services -->', this.provider.services);
+		        // ...do ClientTypes
+				this.provider.client_types = this.clienttypes.filter(function(item, idx) {
+		        	if(this.providerClientTypes.indexOf(item.id) !== -1) {
+		        		return true;
+		        	}
+		        	return false;
+		        }.bind(this));
 
-				nhmservice.updateProviderServices(this, {id: this.provider.id, services: this.provider.services})
+		        this.provider.client_types = this.provider.client_types.map(function(item, idx) {
+		        	// only retain the required fields of the client type items
+		        	return {
+		        		id: item.id,
+		        		name: item.name
+		        	};
+		        }.bind(this));
+
+		        //console.log('provider services -->', this.provider.services);
+
+				nhmservice.updateProviderServices(this, {id: this.provider.id, services: this.provider.services, client_types: this.provider.client_types})
 					.then((response) => {
 						console.log(response);
 						this.provider = response.data;
-						Materialize.toast("Your services have been updated!", 2000);
+						Materialize.toast("Your services and client types have been updated!", 2000);
 					}, (err) => {
 						console.log('whoops...error...', err);
-						Materialize.toast("Unable to update your services. Please try again.", 2000);
+						Materialize.toast("Unable to update your services and/or client types. Please try again.", 2000);
 					});
 			},
 

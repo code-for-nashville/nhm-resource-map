@@ -10,7 +10,7 @@
 
 
 <script>
-	import { eventBus } from '../main';
+	import { eventBus } from './helpers';
 	require('materialize-css/dist/js/materialize');
 
 	export default {

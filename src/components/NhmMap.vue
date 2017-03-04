@@ -8,7 +8,7 @@
 
 
 <script>
-	import { eventBus, resourceTypes } from '../main';
+	import { eventBus, resourceTypes } from './helpers';
 	import nhmservice from '../gateways/nhmservice';
 	require('materialize-css/dist/js/materialize');
 	

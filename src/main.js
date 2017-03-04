@@ -19,6 +19,7 @@ Vue.use(VueResource);
 Vue.http.options.emulateJSON = true;
 
 /* eslint-disable no-new */
+/*
 export const eventBus = new Vue();
 
 export const resourceTypes = {
@@ -26,6 +27,7 @@ export const resourceTypes = {
     EVENTS: { name: 'events', display: 'Events'},
     URGENTNEEDS: { name: 'urgent-needs', display: 'Urgent Needs'}
 };
+*/
 
 const routes = [
 		{ path: '/', component: Mapp, name: 'home', props: true },

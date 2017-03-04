@@ -2,7 +2,11 @@
 
   	<!-- right side panel -->
 	<section id="results-panel" class="side-nav side-panel"><!-- id=nav-mobile -->
-	    <h6 class="center"><strong>Find {{resourceTypeAsTitle}}</strong></h6>
+	    <h6 class="center panel-heading">
+	    	<strong>Find {{resourceTypeAsTitle}}</strong>
+	    	<i class="material-icons tooltipped" data-position="bottom"
+	    		:data-tooltip="toolTipText">info</i>
+    	</h6>
 
 	    
 
@@ -85,6 +89,14 @@
 	            </div>
 
 	            <div class="input-field col s12">
+	              <select class="clienttype-options" name="clienttype" v-change="doClientTypeChange">
+	                <option value="" selected>Choose a client type</option>
+	                <option v-for="ctype in clienttypes" :value="ctype.id" class="">{{ctype.name}}</option>
+	              </select>
+	              <label for="service">Client Type</label>
+	            </div>
+
+	            <div class="input-field col s12">
 	              <button class="btn waves-effect waves-light right" type="submit" name="action" v-on:click.prevent="doTriggerSearch">Search
 	                <i class="material-icons right">search</i>
 	              </button>
@@ -164,7 +176,7 @@
 
 
 <script>
-	import { eventBus, resourceTypes } from '../main';
+	import { eventBus, resourceTypes } from './helpers';
 	require('materialize-css/dist/js/materialize');
 
 	//console.log(resourceTypes);
@@ -180,7 +192,8 @@
 				startDate: null,
 				endDate: null,
 				urgentNeedDate: null,
-				selected_service: null
+				selected_service: null,
+				selected_clienttype: null
 			};
 		},
 		props: {
@@ -198,6 +211,11 @@
 				type: Array,
 				default: [],
 				required: false
+			},
+			clienttypes: {
+				type: Array,
+				default: [],
+				required: false
 			}
 		},
 		created() {
@@ -209,6 +227,7 @@
 		    	edge: 'right',
 		    	width: 420
 		    });
+		    $('.tooltipped').tooltip({delay: 50});
 
 		    // Register to listen on eventBus
 			eventBus.$on('select-resource-type', resourceType => {
@@ -216,10 +235,14 @@
 			});
 
 			console.log("NhmResultsPanel mounted", this.services);
+
+			//on first mount...jus trigger a broad search
+			this.doTriggerSearch();
 		},
 
 		updated() {
 			$('select:not([multiple])').material_select();
+			$('.tooltipped').tooltip({delay: 50});
 			console.log("NhmResultsPanel updated...");
 		},
 		computed: {
@@ -234,6 +257,24 @@
 					return printReady;
 				}
 				return "Resources"
+			},
+
+			toolTipText: function() {
+				var tooltip = 'Enter keywords to search by';
+				switch(this.resourceType) {
+					case 'resources':
+						tooltip = 'Search for organizations by name and services offered';
+						break;
+					case 'events':
+						tooltip = 'Search for events using keywords and date range';
+						break;
+					case 'urgent-needs':
+						tooltip = 'Search for urgent needs using keywords and date cutoff';
+						break;
+					default:
+						break;
+				}
+				return tooltip;
 			}
 		},
 		methods: {
@@ -243,6 +284,10 @@
 			doServiceChange: function(el) {
 				this.selected_service = $(el).val();
 				console.log("selected_service: ", this.selected_service);
+			},
+			doClientTypeChange: function(el) {
+				this.selected_clienttype = $(el).val();
+				console.log("selected_clienttype: ", this.selected_clienttype);
 			},
 			doDateFieldChange: function(el) {
 				var target = $(el).attr('name'),
@@ -272,6 +317,7 @@
 				switch(this.resourceType) {
 					case resourceTypes.RESOURCES.name:
 						params['service'] = this.selected_service;
+						params['clienttype'] = this.selected_clienttype;
 						break;
 					case resourceTypes.EVENTS.name:
 						params['startDate'] = this.startDate;
@@ -342,11 +388,20 @@
 		color: #676767;
 	}
 
+	#results-panel .panel-heading i {
+		margin-top: -5px;
+		cursor: pointer;
+	}
+	#results-panel .panel-heading strong {
+		vertical-align: top;
+	}
+
 	.search-results {
 		padding-bottom: 20px;
 	}
 
-	.service-options, .service-options option {
+	.service-options, .service-options option,
+	.clienttype-options, .clienttype-options option {
 		font-size: 0.85em !important;
 	}
 

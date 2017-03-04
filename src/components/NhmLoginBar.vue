@@ -108,7 +108,7 @@
 
 
 <script>
-	import { eventBus } from '../main';
+	import { eventBus } from './helpers';
 	import nhmservice from '../gateways/nhmservice';
 	require('materialize-css/dist/js/materialize');
 
@@ -201,6 +201,11 @@
 						Materialize.toast('Your request has been received and will be processed soon.', 3000);
 						//this.$set(this.services, response.data);
 						//console.log('got data...', this.services);
+						this.registration = {
+							organization: null,
+							email: null,
+							phone: null
+						};
 
 					}, (err) => {
 						//context.error = err;

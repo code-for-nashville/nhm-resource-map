@@ -12,7 +12,7 @@
   import NhmNavbar from './components/NhmNavbar'
   import NhmLoginBar from './components/NhmLoginBar'
   import NhmFooter from './components/NhmFooter'
-  import { resourceTypes } from './main'
+  import { resourceTypes } from './components/helpers'
   import nhmservice from './gateways/nhmservice';
 
   require('materialize-css/dist/js/materialize');
