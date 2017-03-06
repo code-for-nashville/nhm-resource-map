@@ -135,6 +135,14 @@
 			};
 		},
 
+		props: {
+			locale: {
+				type: String,
+				default: 'en',
+				required: false
+			}
+		},
+
 		mounted() {
 			this.key = window.localStorage.getItem(NHMTOKEN);
 			this.provider.id = window.localStorage.getItem(NHMPROVIDERID);

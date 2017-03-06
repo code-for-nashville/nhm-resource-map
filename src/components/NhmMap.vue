@@ -130,8 +130,9 @@
 					return marker;
 				});
 				//console.log(renderMarkers);
-				this.resourceMap.fitBounds(bounds);
+				if(renderMarkers.length > 0) this.resourceMap.fitBounds(bounds);
 				//this.resourceMap.setCenter(bounds.getCenter());
+				//AIzaSyB6L-gd4MueuPig0CtU6He3nf9lebyfYwI
 				this.resourceMap.addMarkers(renderMarkers);
 			}
 		}

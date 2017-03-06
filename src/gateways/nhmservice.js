@@ -83,6 +83,11 @@ export default {
 		return context.$http.get(endpoint);
 	},
 
+	getLanguages(context) {
+		const endpoint = API_URL + 'languages/';
+		return context.$http.get(endpoint);
+	},
+
 	searchResources(context, params) {
 		let endpoint = API_URL + 'providers?search=' + (params.search ? params.search: '');
 		if(params.service && parseInt(params.service)) {
@@ -357,4 +362,24 @@ export default {
 		});
 		
 	},
+
+	googleTranslate(context, params, callback) {
+		const endpoint = "https://translation.googleapis.com/language/translate/v2";
+		if(!params.key) {
+			params.key = 'AIzaSyB6L-gd4MueuPig0CtU6He3nf9lebyfYwI';
+		}
+		if(!params.source) {
+			params.source = 'en';
+		}
+
+		context.$http.post(endpoint, params)
+			.then((resp) => {
+				var transText = resp.data.data.translations[0].translatedText;
+				if(typeof callback === 'function') {
+					callback(transText);
+				}
+			}, (err) => {
+				console.log("whoops...Error: ", err);
+			});
+	}
 }

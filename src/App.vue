@@ -1,10 +1,12 @@
 <template>
   <div id="app">
-    <nhm-navbar :showMenu="showNavMenu" v-on:show-login-bar="doShowLoginBar"></nhm-navbar>
+    <nhm-navbar :showMenu="showNavMenu" 
+    v-on:show-login-bar="doShowLoginBar"
+    v-on:locale-change="doLocaleChange"></nhm-navbar>
     <nhm-login-bar v-on:provider-authenticated="doProviderAuthenticated"
-                    v-on:route-clicked="doRouteClicked"></nhm-login-bar>
+                    v-on:route-clicked="doRouteClicked" v-bind:locale="locale"></nhm-login-bar>
     <router-view></router-view>
-    <nhm-footer></nhm-footer>
+    <nhm-footer v-bind:locale="locale"></nhm-footer>
   </div>
 </template>
 
@@ -25,6 +27,7 @@
     data() {
       return {
         showNavMenu: true,
+        locale: 'en',
       };
     },
     created() {
@@ -78,6 +81,10 @@
       },
       doServicesLoaded: function(services) {
 
+      },
+      doLocaleChange: function(new_locale) {
+        this.locale = new_locale;
+        console.log('changed locale to ' + this.locale);
       }
 
     } //methods

@@ -3,9 +3,11 @@
     <nhm-map v-bind:markers="markers" 
       v-on:popup-provider="doPopupProvider"
       v-on:popup-event="doPopupEvent"
-      v-on:popup-urgent-need="doPopupUrgentNeed"></nhm-map>
+      v-on:popup-urgent-need="doPopupUrgentNeed"
+      v-bind:locale="locale"></nhm-map>
     <div class="bookmark-button">
-      <a class="btn-floating btn-large waves-effect waves-light red tooltipped" data-position="left" data-tooltip="Bookmark this search for sharing" @click.prevent="showBookmarkModal">
+      <a class="btn-floating btn-large waves-effect waves-light red tooltipped" 
+      data-position="left" :data-tooltip="translate.bookmarkTooltip" @click.prevent="showBookmarkModal">
         <i class="material-icons">turned_in_out</i>
       </a>
     </div>
@@ -15,6 +17,7 @@
       v-on:popup-provider="doPopupProvider"
       v-on:popup-event="doPopupEvent"
       v-on:popup-urgent-need="doPopupUrgentNeed"
+      v-bind:locale="locale"
       v-bind:results="results"
       v-bind:services="services"
       v-bind:clienttypes="clienttypes"
@@ -42,18 +45,18 @@
               <p class="col s6">
                 <strong>Services</strong><br/>
                 <span v-for="srvc in selected_provider.services">{{srvc.name}}<br/></span>
-                <span v-if="!(selected_provider.services && selected_provider.services.length)">No services information provided</span>
+                <span v-if="!(selected_provider.services && selected_provider.services.length)">{{ translate.noServicesInfo }}</span>
               </p>
               <p class="col s6">
                 <strong>Client Types</strong><br/>
                 <span v-for="ctype in selected_provider.client_types">{{ctype.name}}<br/></span>
-                <span v-if="!(selected_provider.client_types && selected_provider.client_types.length)">No client information provided</span>
+                <span v-if="!(selected_provider.client_types && selected_provider.client_types.length)">{{ translate.noClientsInfo }}</span>
               </p>
             </div>
           </div>
           <div class="card-action">
-            <a v-if="selected_provider.website" :href="selected_provider.website" target="_blank">Visit Website</a>
-            <a v-if="selected_provider.facebook" :href="selected_provider.website" target="_blank">Visit Facebook</a>
+            <a v-if="selected_provider.website" :href="selected_provider.website" target="_blank">{{ translate.websiteButton }}</a>
+            <a v-if="selected_provider.facebook" :href="selected_provider.website" target="_blank">{{ translate.facebookButton }}</a>
           </div>
         </div>
       </div>
@@ -78,7 +81,7 @@
             <p v-if="selected_provider.description">{{ selected_provider.description }}</p>
           </div>
           <div class="card-action">
-            <a v-if="selected_provider.event_url" :href="selected_provider.event_url" target="_blank">Visit Event Website</a>
+            <a v-if="selected_provider.event_url" :href="selected_provider.event_url" target="_blank">{{ translate.eventWebsiteButton }}</a>
           </div>
         </div>
       </div>
@@ -86,13 +89,27 @@
 
     <!-- Share/Bookmark Search Link -->
     <div id="bookmarkModal" class="modal modal-close">
-        <div class="modal-content">
-          <h5>Share or bookmark this search?</h5>
-          <p>Use the link below to bookmark or share this search.</strong>  You can copy the link below and share it via social media or email.  The results of this search will be saved retrievable at this link:</p>
+        <div class="modal-content"> 
+          <h5>{{ translate.bookmarkModalTitle }}</h5>
+          <p>{{ translate.bookmarkModalInstructions }}:</p>
           <p align="center"><strong class="nhm-grey">{{ getBookmarkLink }}</strong></p>
         </div>
         <div class="modal-footer">
-          <a class=" modal-action modal-close waves-effect waves-green btn-flat">DONE</a>
+          <a class=" modal-action modal-close waves-effect waves-green btn-flat">{{ translate.bookmarkModalButtonDone }}</a>
+        </div>
+    </div>
+
+    <!-- Translation Notice -->
+    <div id="translatingModal" class="modal modal-close">
+        <div class="modal-content"> 
+          <h5>Translating site...</h5>
+          <p align="center">Translating the site. This may take a few seconds!</p>
+          <div class="progress">
+            <div class="indeterminate"></div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <a class=" modal-action modal-close waves-effect waves-green btn-flat">Close</a>
         </div>
     </div>
 
@@ -130,11 +147,31 @@
         provider: {},
         currentQuery: {},
         currentBookmark: null,
+        locale: 'en',
+        messages: {
+          bookmarkTooltip: "Bookmark this search for sharing",
+          websiteButton: "Visit Website",
+          facebookButton: "Visit Facebook",
+          eventWebsiteButton: "Visit Event Website",
+          bookmarkModalTitle: "Share or bookmark this search?",
+          bookmarkModalInstructions: "Use the link below to bookmark or share this search.  You can copy the link below and share it via social media or email.  The results of this search will be saved retrievable at this link",
+          bookmarkModalButtonDone: "DONE",
+          noServicesInfo: "No services information provided",
+          noClientsInfo: "No client information provided",
+        },
+        translate: {},
         //showNavMenu: true,
       };
     },
+    props: {
+    },
     created() {
       console.log('Mapp.vue created...');
+      //translate items in translate object
+      for(let k in this.messages) {
+        //console.log('translating ' + k);
+        this._t(k, this.messages);
+      }
     },
     mounted() {
       console.log('Mapp.vue mounted...');
@@ -156,6 +193,11 @@
           this.resourceType = resourceType;
           this.currentBookmark = null;
         }
+      });
+
+      eventBus.$on('locale-change', locale => {
+        this.locale = locale;
+        console.log("...also Mapp heard locale-change: " + this.locale);
       });
 
       // fetch the services
@@ -193,9 +235,22 @@
       }
 
     },
+    beforeUpdate: function() {
+      //translate items in translate object
+      for(let k in this.messages) {
+        //console.log('beforeUpdated... translating ' + k);
+        this._t(k, this.messages);
+      }
+    },
     updated() {
+      console.log('Mapp updated...');
       this.updateMarkers(this.resourceType);
+
+      //reinitialize tooltips
+      $('.tooltipped').tooltip({delay: 50});
       //console.log('Mapp updated ...resourceType: ' + this.resourceType);
+
+      //console.log(this.translate.bookmarkModalTitle);
     },
     computed: {
       getSelectedProviderAvatar: function() {
@@ -210,6 +265,25 @@
       }
     },
     methods: {
+      _t: function(key, context, done) {
+        if(!context) context = this;
+        //console.log( key + " on 'this': ", context[key]);
+
+        this.translate[key] = context[key];
+
+        if(this.locale !== 'en') {
+          nhmservice.googleTranslate(this, {
+            q: context[key],
+            target: this.locale
+          },
+          function(transText) {
+            this.translate[key] = transText;
+          }.bind(this));
+        }
+        
+        return this.translate[key];
+      },
+
       doHandleSearch: function(params) {
         console.log('handling do-search', params);
         let webservice;
@@ -391,7 +465,24 @@
         //console.log('Mapp has updated markers -->', resourceType, this.markers);
       }
 
-    } //methods
+    }, //methods
+
+    watch: {
+      locale: function(old_locale) {
+        var self = this;
+        $('#translatingModal').modal('open');
+        console.log('locale changed: ' + old_locale);
+        for(let k in this.messages) {
+          //console.log('translating ' + k);
+          this._t(k, this.messages);
+        }
+
+        setTimeout(function(){
+          console.log(self.translate.bookmarkModalTitle);
+          $('#translatingModal').modal('close');
+        }, 9000);
+      }
+    },
 
   }
 
