@@ -99,7 +99,9 @@
 		watch: {
 			markers: function(oldMarkers) {
 				var self = this;
-				console.log('markers changed in map to: ', this.markers);
+				//console.log('markers changed in map to: ', this.markers);
+				var bounds = new google.maps.LatLngBounds();
+
 				this.resourceMap.removeMarkers();
 				var renderMarkers = this.markers.map((val, idx) => {
 					//console.log(val);
@@ -123,9 +125,13 @@
 						};
 					}
 
+					bounds.extend(marker);
+
 					return marker;
 				});
-				console.log(renderMarkers);
+				//console.log(renderMarkers);
+				this.resourceMap.fitBounds(bounds);
+				//this.resourceMap.setCenter(bounds.getCenter());
 				this.resourceMap.addMarkers(renderMarkers);
 			}
 		}

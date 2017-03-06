@@ -154,6 +154,7 @@
           //console.log(this.results, this.resourceType);
           this.doClearResults();
           this.resourceType = resourceType;
+          this.currentBookmark = null;
         }
       });
 
@@ -212,6 +213,12 @@
       doHandleSearch: function(params) {
         console.log('handling do-search', params);
         let webservice;
+        if(params["clienttype"]) {
+          params["clienttype"] = parseInt(params["clienttype"]);
+        }
+        if(params["service"]) {
+          params["service"] = parseInt(params["service"]);
+        }
         this.currentQuery = params;
 
         switch(params.resourceType) {
@@ -252,15 +259,6 @@
           default:
             break;
         }
-
-        // regenerate currentBookmark for this currentQuery
-        nhmservice.encodeBookmark(this, this.currentQuery).then((response) => {
-          this.currentBookmark = response.data && response.data.bookmark;
-          console.log('created new currentBookmark for currentQuery: ' + this.currentBookmark);
-        }, (err) => {
-          //context.error = err;
-          console.log('whoops...error...', err);
-        });
 
       }, //doHandleSearch
 
@@ -336,7 +334,19 @@
       },
 
       showBookmarkModal: function() {
+        // regenerate currentBookmark for this currentQuery
+        if(!this.currentBookmark) {
+          nhmservice.encodeBookmark(this, this.currentQuery).then((response) => {
+            this.currentBookmark = response.data && response.data.bookmark;
+            console.log('created new currentBookmark for currentQuery: ' + this.currentBookmark);
+          }, (err) => {
+            //context.error = err;
+            console.log('whoops...error...', err);
+          });
+        }
+
         var $modal = $('#bookmarkModal');
+
         $modal.modal('open');
       },
 
@@ -384,6 +394,9 @@
     } //methods
 
   }
+
+  //http://localhost:8080?q=04937836-d759-435f-a761-75e0efd0e291
+  //http://localhost:8080?q=a59b23c7-14ba-4f24-a4c6-c8515214ba2d
 </script>
 
 <style>

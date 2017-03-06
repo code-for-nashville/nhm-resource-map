@@ -332,7 +332,7 @@ export default {
 
 	decodeBookmark(context, bookmark) {
 		var self = this;
-		const endpoint = BASE_URL + 'decode-bookmark/';  
+		const endpoint = BASE_URL + 'bookmarks/decode/';  
 		const key = window.localStorage.getItem('nhmtoken');
 
 		return context.$http.post(endpoint, {bookmark: bookmark}, {
@@ -346,10 +346,10 @@ export default {
 
 	encodeBookmark(context, params) {
 		var self = this;
-		const endpoint = BASE_URL + 'encode-bookmark/';
+		const endpoint = BASE_URL + 'bookmarks/encode/';
 		const key = window.localStorage.getItem('nhmtoken');
 
-		return context.$http.post(endpoint, {params: params}, {
+		return context.$http.post(endpoint, params, {
 			headers: {
 				Authorization: 'Token ' + key,
 				'Content-Type': 'application/json'
