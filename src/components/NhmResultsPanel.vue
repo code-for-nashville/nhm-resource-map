@@ -6,7 +6,9 @@
 	    	<strong>{{ translate.find }} {{ translate[resourceTypeAsTitle] }}</strong>
 	    	<i class="material-icons tooltipped" data-position="bottom"
 	    		:data-tooltip="toolTipText">info</i>
+    		<span class="hide-me">{{locale}}</span>
     	</h6>
+    	
 
 	    
 
@@ -465,6 +467,9 @@
 				  	$('select:not([multiple])').material_select();
 					$('.tooltipped').tooltip({delay: 50});
 				  	//$('#translatingModal').modal('close');
+				  	eventBus.$emit('select-resource-type', 'events');
+				  	eventBus.$emit('select-resource-type', 'resources');
+				  	self.doTriggerSearch();
 				}, 7000);
 			},
 
@@ -475,7 +480,7 @@
 					this.messages[this.clienttypes[x].name] = this.clienttypes[x].name;
 				}
 
-				console.log(this.messages);
+				//console.log(this.messages);
 			},
 
 			services: function(old_services) {
@@ -485,7 +490,7 @@
 					this.messages[this.services[x].name] = this.services[x].name;
 				}
 
-				console.log(this.messages);
+				//console.log(this.messages);
 			}
 	    },
 	}
@@ -569,6 +574,11 @@
 	.collection-item.event .host,
 	.collection-item.need .host {
 		opacity: 0.7;
+	}
+
+	.hide-me {
+		opacity: 0.0;
+		height: 1px;
 	}
 
 </style>

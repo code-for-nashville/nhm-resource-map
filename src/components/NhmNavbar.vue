@@ -8,12 +8,9 @@
 				<img src="../assets/img/nav_logo.png" class="nhm-logo"/>
 			</a>
 
-			<div class="input-field col right locale-options">
+			<div v-show="showMenu" class="input-field col right locale-options">
 			    <select v-model="locale" id="locale-changer" v-change="doLocaleChanged">
 			    	<option v-for="lang in locales" :value="lang.iso_code">{{ lang.language }}</option>
-			    	<!-- <option value="es">Spanish</option>
-			    	<option value="fr">French</option>
-			    	<option value="ch">Chinese</option> -->
 			    </select>
 			</div>
 
@@ -40,6 +37,10 @@
 			showMenu: {
 				default: true,
 				type: Boolean
+			},
+			topLocale: {
+				default: 'en',
+				type: String
 			}
 		},
 
@@ -99,6 +100,7 @@
 		  		.then((resp) => {
 		  			this.locales = resp.data;
 		  			this.locales.unshift({ id: 0, iso_code: 'en', language: 'English'});
+		  			if(this.locale !== 'en') this.doLocaleChanged();
 		  		}, (err) => {
 		  			console.log("whoops...error: " + err);
 		  		});
@@ -183,6 +185,10 @@
 	.login-panel-trigger {
 		float: left;
 		position: relative;
+	}
+
+	.results-panel-trigger {
+		text-transform: capitalize;
 	}
 
 	#main-nav {

@@ -7,7 +7,7 @@
       v-bind:locale="locale"></nhm-map>
     <div class="bookmark-button">
       <a class="btn-floating btn-large waves-effect waves-light red tooltipped" 
-      data-position="left" :data-tooltip="translate.bookmarkTooltip" @click.prevent="showBookmarkModal">
+      data-position="left" :data-tooltip="translate[getTranslationFieldName('bookmarkTooltip')]" @click.prevent="showBookmarkModal">
         <i class="material-icons">turned_in_out</i>
       </a>
     </div>
@@ -40,23 +40,28 @@
             <p>
               <strong>{{ selected_provider.phone }}</strong><br/>
             </p>
-            <p v-if="selected_provider.description">{{ selected_provider.description }}</p><br/>
+            <p v-if="translate[getTranslationFieldName('selected_provider_description'+selected_provider.id)]">{{ translate[getTranslationFieldName('selected_provider_description'+selected_provider.id)] }}</p><br/>
+            <!--
+            <div v-else class="progress">
+                <div class="indeterminate"></div>
+            </div>
+            -->
             <div class="row">
               <p class="col s6">
-                <strong>Services</strong><br/>
-                <span v-for="srvc in selected_provider.services">{{srvc.name}}<br/></span>
-                <span v-if="!(selected_provider.services && selected_provider.services.length)">{{ translate.noServicesInfo }}</span>
+                <strong>{{ translate[getTranslationFieldName('services')] }}</strong><br/>
+                <span v-for="srvc in selected_provider.services">{{ translate[getTranslationFieldName(srvc.name)] }}<br/></span>
+                <span v-if="!(selected_provider.services && selected_provider.services.length)">{{ translate[getTranslationFieldName('noServicesInfo')] }}</span>
               </p>
               <p class="col s6">
-                <strong>Client Types</strong><br/>
-                <span v-for="ctype in selected_provider.client_types">{{ctype.name}}<br/></span>
-                <span v-if="!(selected_provider.client_types && selected_provider.client_types.length)">{{ translate.noClientsInfo }}</span>
+                <strong>{{ translate[getTranslationFieldName('clientTypes')] }}</strong><br/>
+                <span v-for="ctype in selected_provider.client_types">{{ translate[getTranslationFieldName(ctype.name)] }}<br/></span>
+                <span v-if="!(selected_provider.client_types && selected_provider.client_types.length)">{{ translate[getTranslationFieldName('noClientsInfo')] }}</span>
               </p>
             </div>
           </div>
           <div class="card-action">
-            <a v-if="selected_provider.website" :href="selected_provider.website" target="_blank">{{ translate.websiteButton }}</a>
-            <a v-if="selected_provider.facebook" :href="selected_provider.website" target="_blank">{{ translate.facebookButton }}</a>
+            <a v-if="selected_provider.website" :href="selected_provider.website" target="_blank">{{ translate[getTranslationFieldName('websiteButton')] }}</a>
+            <a v-if="selected_provider.facebook" :href="selected_provider.website" target="_blank">{{ translate[getTranslationFieldName('facebookButton')] }}</a>
           </div>
         </div>
       </div>
@@ -78,10 +83,10 @@
               {{ selected_provider.event_city}} {{ selected_provider.event_state }} {{ selected_provider.event_zip }}
             </p>
             
-            <p v-if="selected_provider.description">{{ selected_provider.description }}</p>
+            <p v-if="selected_provider.description">{{ translate[getTranslationFieldName('selected_provider_description'+selected_provider.id)] }}</p>
           </div>
           <div class="card-action">
-            <a v-if="selected_provider.event_url" :href="selected_provider.event_url" target="_blank">{{ translate.eventWebsiteButton }}</a>
+            <a v-if="selected_provider.event_url" :href="selected_provider.event_url" target="_blank">{{ translate[getTranslationFieldName('eventWebsiteButton')] }}</a>
           </div>
         </div>
       </div>
@@ -90,12 +95,12 @@
     <!-- Share/Bookmark Search Link -->
     <div id="bookmarkModal" class="modal modal-close">
         <div class="modal-content"> 
-          <h5>{{ translate.bookmarkModalTitle }}</h5>
-          <p>{{ translate.bookmarkModalInstructions }}:</p>
+          <h5>{{ translate[getTranslationFieldName('bookmarkModalTitle')] }}</h5>
+          <p>{{ translate[getTranslationFieldName('bookmarkModalInstructions')] }}:</p>
           <p align="center"><strong class="nhm-grey">{{ getBookmarkLink }}</strong></p>
         </div>
         <div class="modal-footer">
-          <a class=" modal-action modal-close waves-effect waves-green btn-flat">{{ translate.bookmarkModalButtonDone }}</a>
+          <a class=" modal-action modal-close waves-effect waves-green btn-flat">{{ translate[getTranslationFieldName('bookmarkModalButtonDone')] }}</a>
         </div>
     </div>
 
@@ -158,7 +163,10 @@
           bookmarkModalButtonDone: "DONE",
           noServicesInfo: "No services information provided",
           noClientsInfo: "No client information provided",
+          services: "Services",
+          clientTypes: "Client Types"
         },
+        selected_provider_desc: null,
         translate: {},
         //showNavMenu: true,
       };
@@ -203,6 +211,13 @@
       // fetch the services
       nhmservice.getServices(this).then((response) => {
         this.services = response.data;
+
+        //add to translation shoe
+        for(let x=0; x < this.services.length; x++) {
+          //console.log(srvc, this.services[x])
+          this.messages[this.services[x].name] = this.services[x].name;
+        }
+
         //console.log('got data...', this.services);
         eventBus.$emit('services-loaded', this.services);
 
@@ -214,6 +229,13 @@
       // fetch the client types
       nhmservice.getClientTypes(this).then((response) => {
         this.clienttypes = response.data;
+
+        //add to translation shoe
+        for(let x=0; x < this.clienttypes.length; x++) {
+          //console.log(srvc, this.clienttypes[x])
+          this.messages[this.clienttypes[x].name] = this.clienttypes[x].name;
+        }
+
         eventBus.$emit('client-types-loaded', this.clienttypes);
 
       }, (err) => {
@@ -262,26 +284,86 @@
 
       getBookmarkLink: function() {
         return window.location.protocol + '//' + window.location.host + '?q=' + this.currentBookmark;
+      },
+
+      getSelectedProviderDescription: function() {
+        if(this.selected_provider) {
+          return this.translate['selected_provider_description'];
+        }
+
+        return '';
       }
     },
     methods: {
-      _t: function(key, context, done) {
+      _t: function(key, context) {
+        var self = this;
         if(!context) context = this;
         //console.log( key + " on 'this': ", context[key]);
 
-        this.translate[key] = context[key];
+        if(this.translate[this.getTranslationFieldName(key)]) {
 
+          return this.translate[this.getTranslationFieldName(key)];
+
+        } else {
+
+          if(this.locale !== 'en') {
+            nhmservice.googleTranslate(this, {
+              q: context[key],
+              target: this.locale
+            },
+            function(transText) {
+              this.translate[this.getTranslationFieldName(key)] = transText;
+              //console.log(this.translate[key]);
+            }.bind(this));
+          } else {
+            this.translate[this.getTranslationFieldName(key)] = context[key];
+          }
+
+        }
+
+        return this.translate[this.getTranslationFieldName(key)];
+      },
+
+      translateSelectedProviderDescription: function() {
         if(this.locale !== 'en') {
           nhmservice.googleTranslate(this, {
-            q: context[key],
+            q: this.selected_provider.description,
             target: this.locale
           },
           function(transText) {
-            this.translate[key] = transText;
+            //this.translate['selected_provider_description'] = transText;
+            this.translate[this.getTranslationFieldName('selected_provider_description'+this.selected_provider.id)] = transText;
           }.bind(this));
+        } else {
+          this.translate[this.getTranslationFieldName('selected_provider_description'+this.selected_provider.id)] = this.selected_provider.description;
         }
-        
-        return this.translate[key];
+      },
+
+      getTranslationFieldName: function(fieldName) {
+        return fieldName + '_' + this.locale;
+      },
+
+      preFetchResultTranslations: function() {
+        var self = this;
+        //find the right provider object
+        for(let p=0; p < this.results.length; p++) {
+          var fetched_provider = this.results[p];
+
+          (function(provider, context){
+            if(context.locale !== 'en') {
+              nhmservice.googleTranslate(context, {
+                q: fetched_provider.description,
+                target: context.locale
+              },
+              function(transText) {
+                //this.translate['selected_provider_description'] = transText;
+                context.translate[context.getTranslationFieldName('selected_provider_description'+fetched_provider.id)] = transText;
+              }.bind(context));
+            } else {
+              context.translate[context.getTranslationFieldName('selected_provider_description'+fetched_provider.id)] = fetched_provider.description;
+            }
+          }(fetched_provider, self));
+        }
       },
 
       doHandleSearch: function(params) {
@@ -301,6 +383,7 @@
               .then((response) => {
                 this.results = response.data;
                 this.updateMarkers(params.resourceType);
+                this.preFetchResultTranslations();
               }, (err) => {
                 //context.error = err;
                 console.log('whoops... resources error...', err);
@@ -311,6 +394,7 @@
               .then((response) => {
                 this.results = response.data;
                 this.updateMarkers(params.resourceType);
+                this.preFetchResultTranslations();
                 //console.log('received events into this.results[]');
 
               }, (err) => {
@@ -323,6 +407,7 @@
               .then((response) => {
                 this.results = response.data;
                 this.updateMarkers(params.resourceType);
+                this.preFetchResultTranslations();
                 //console.log('received urgent-needs into this.results[]',this.results);
 
               }, (err) => {
@@ -347,6 +432,9 @@
         for(let p=0; p < this.results.length; p++) {
           if(this.results[p].id === provider_id) {
             this.selected_provider = this.results[p];
+
+            this.translateSelectedProviderDescription()
+
             break;
           }
         }
@@ -478,10 +566,11 @@
         }
 
         setTimeout(function(){
-          console.log(self.translate.bookmarkModalTitle);
+          console.log(self.translate[self.getTranslationFieldName('bookmarkModalTitle')]);
           $('#translatingModal').modal('close');
         }, 9000);
-      }
+      },
+
     },
 
   }

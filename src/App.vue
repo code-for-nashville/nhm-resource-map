@@ -2,7 +2,8 @@
   <div id="app">
     <nhm-navbar :showMenu="showNavMenu" 
     v-on:show-login-bar="doShowLoginBar"
-    v-on:locale-change="doLocaleChange"></nhm-navbar>
+    v-on:locale-change="doLocaleChange"
+    v-bind:topLocale="locale"></nhm-navbar>
     <nhm-login-bar v-on:provider-authenticated="doProviderAuthenticated"
                     v-on:route-clicked="doRouteClicked" v-bind:locale="locale"></nhm-login-bar>
     <router-view></router-view>
@@ -14,7 +15,7 @@
   import NhmNavbar from './components/NhmNavbar'
   import NhmLoginBar from './components/NhmLoginBar'
   import NhmFooter from './components/NhmFooter'
-  import { resourceTypes } from './components/helpers'
+  import { resourceTypes, eventBus } from './components/helpers'
   import nhmservice from './gateways/nhmservice';
 
   require('materialize-css/dist/js/materialize');
@@ -36,6 +37,12 @@
     },
     mounted() {
       console.log('App.vue mounted...');
+
+      eventBus.$on('locale-change', locale => {
+        this.locale = locale;
+        console.log("...also App heard locale-change: " + this.locale);
+      });
+
       /*
       $('select:not([multiple])').material_select();
       $('.datepicker').pickadate({
