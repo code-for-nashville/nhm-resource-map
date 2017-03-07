@@ -3,10 +3,10 @@
 //import {router} from '../main'
 
 // URL and endpoint constants
-const API_URL = 'http://127.0.0.1:8000/resources/';
-const BASE_URL = 'http://127.0.0.1:8000/';
-//const API_URL = 'http://104.236.119.135/resources/'
-//const BASE_URL = 'http://104.236.119.135/'
+//const API_URL = 'http://127.0.0.1:8000/resources/';
+//const BASE_URL = 'http://127.0.0.1:8000/';
+const API_URL = 'http://104.236.119.135/resources/'
+const BASE_URL = 'http://104.236.119.135/'
 
 const LOGIN_URL = BASE_URL + 'account/authenticate/';
 const SIGNUP_URL = BASE_URL + 'account/register/';
