@@ -58,6 +58,14 @@
                 <span v-if="!(selected_provider.client_types && selected_provider.client_types.length)">{{ translate[getTranslationFieldName('noClientsInfo')] }}</span>
               </p>
             </div>
+            <div v-if="selected_provider.volunteer_contact_name" class="row">
+              <p class="col s12">
+                <h6><strong>{{ translate[getTranslationFieldName('wantVolunteer')] }}</strong></h6>
+                <span>{{ translate[getTranslationFieldName('askFor')] }} <strong>{{ selected_provider.volunteer_contact_name }}</strong></span><br/>
+                <em>{{ selected_provider.volunteer_contact_email }}</em><br/>
+                <em>{{ selected_provider.volunteer_contact_phone }}</em>
+              </p>
+            </div>
           </div>
           <div class="card-action">
             <a v-if="selected_provider.website" :href="selected_provider.website" target="_blank">{{ translate[getTranslationFieldName('websiteButton')] }}</a>
@@ -164,7 +172,9 @@
           noServicesInfo: "No services information provided",
           noClientsInfo: "No client information provided",
           services: "Services",
-          clientTypes: "Client Types"
+          clientTypes: "Client Types",
+          wantVolunteer: "Want to Volunteer?",
+          askFor: "Ask for ",
         },
         selected_provider_desc: null,
         translate: {},
