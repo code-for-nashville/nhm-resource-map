@@ -527,13 +527,15 @@
         var temp = [];
         if (resourceType == resourceTypes.RESOURCES.name) {
           for(let i=0; i < this.results.length; i++) {
-            for(let j=0; j < this.results[i].locations.length; j++) {
-              let t = {...this.results[i].locations[j]};
-              t.provider = this.results[i].name;
-              t.provider_id = this.results[i].id;
-              t.item_name = t.name;
-              t.icon = this.results[i].avatar || this.results[i].services[0].icon;
-              temp.push(t);
+            if(this.results[i].locations) {
+              for(let j=0; j < this.results[i].locations.length; j++) {
+                let t = {...this.results[i].locations[j]};
+                t.provider = this.results[i].name;
+                t.provider_id = this.results[i].id;
+                t.item_name = t.name;
+                t.icon = this.results[i].avatar || this.results[i].services[0].icon;
+                temp.push(t);
+              }
             }
           }
         } else if(resourceType == resourceTypes.EVENTS.name) {
