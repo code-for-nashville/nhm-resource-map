@@ -69,13 +69,13 @@
       							<input name="onlocation" type="radio" value="1" v-model="useLocations" id="venue2" />
       							<label for="venue2">Select one of your locations instead</label>
     						</p>
-    						<p  class="col s12 underline"><p>
+    						<p  class="col s12 underline"> </p>
             			</div>
             			<div v-show="useLocations == 1" class="row">
 							<div class="input-field col s12">
 								<select class="location-options" name="location" v-change="doLocationChange">
 									<option value="" selected>Choose a location</option>
-									<option v-for="loc in provider.locations" :value="loc.id" class="">{{loc.name}}</option>
+									<!-- <option v-for="loc in provider.locations" :value="loc.id" class="">{{loc.name}}</option> -->
 								</select>
 								<label for="location">Your Locations</label>
 	            			</div>
@@ -126,7 +126,8 @@
 		        	</div>
 		        	<div class="row">
 						<!-- List needs here... -->
-						<div v-for="need in needs" class="col s12 event-card">
+						<div v-for="need in needs"
+						:key="need.id" class="col s12 event-card">
     						<!-- <h5 class="header">{{ event.title }}</h5> -->
 							<div class="card horizontal">
 								<div class="card-image">
