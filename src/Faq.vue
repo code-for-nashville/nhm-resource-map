@@ -13,7 +13,8 @@
 					</p>
 				</div>
 
-				<ul v-for="faq in faqs" class="collapsible col s12" data-collapsible="expandable">
+				<ul v-for="faq in faqs"
+				:key="faq.id" class="collapsible col s12" data-collapsible="expandable">
 					<li>
 						<div class="collapsible-header">
 							<i class="material-icons">info_outline</i>{{ translate[getQTranslationKey(faq.id)] }}

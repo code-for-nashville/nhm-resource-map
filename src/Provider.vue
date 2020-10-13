@@ -30,6 +30,7 @@
 	        	</div>
 	        	<p class="logo-provider-name">{{provider.name}}</p>
 	        </div>
+	      </div>
 
 	        <!-- details column -->
 	        <div class="details-input col s8 m9">
@@ -128,7 +129,8 @@
 	              <form action="#">
 	                <div class="row pad-top">
 	                  <p class="col s12"><strong>Services Offered</strong></p>
-	                  <p v-for="service in services" class="col s12 m6">
+	                  <p v-for="service in services"
+					  	:key="service.id" class="col s12 m6">
 	                    <input type="checkbox" class="filled-in" :id="'srvc_'+service.id"
 	                    	name="services" :value="service.id" v-model="providerServices" />
 	                    <label :for="'srvc_'+service.id">{{ service.name }}</label>
@@ -136,7 +138,8 @@
 	                </div>
 	                <div class="row">
 	                  <p class="col s12"><strong>Types of Clients</strong></p>
-	                  <p v-for="ctype in clienttypes" class="col s12 m6">
+	                  <p v-for="ctype in clienttypes"
+					  	:key="ctype.id" class="col s12 m6">
 	                    <input type="checkbox" class="filled-in" :id="'ctype_'+ctype.id"
 	                    	name="clienttypes" :value="ctype.id" v-model="providerClientTypes" />
 	                    <label :for="'ctype_'+ctype.id">{{ ctype.name }}</label>
@@ -204,7 +207,8 @@
 
 		                    <div class="col s12">
 		                    
-		                      <div v-for="location in provider.locations" class="card nhm-bg-blue location-card">
+		                      <div v-for="location in provider.locations"
+							  :key="location.id" class="card nhm-bg-blue location-card">
 		                        <div class="card-content white-text">
 		                          <div class="card-title">{{ location.name }}
 		                            <i class="large material-icons left">location_on</i>
@@ -278,7 +282,7 @@
 		<div id="deleteLogoModal" class="modal">
 		    <div class="modal-content">
 		      <h4>Delete Logo?</h4>
-		      <p align="center">Are you sure you want to delete your logo?</strong>?</p>
+		      <p align="center">Are you sure you want to delete your logo??</p>
 		    </div>
 		    <div class="modal-footer">
 		      <a class=" modal-action modal-close waves-effect waves-red btn-flat" @click.prevent="doDeleteLogo">Yes, Delete It!</a>
@@ -727,10 +731,10 @@
 		margin-top: 10px;
 	}
 	@media screen and (min-width: 767px) {
-		.logo-provider-name {
-			/* margin-top: 50px; 
-			margin-top: 0px; */
-		}
+		/* .logo-provider-name {
+			margin-top: 50px; 
+			margin-top: 0px; 
+		} */
 		.logo-controls .file-field .btn {
 			float: none !important;
 			font-size: 0.65rem;

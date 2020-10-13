@@ -49,22 +49,24 @@
             <div class="row">
               <p class="col s6">
                 <strong>{{ translate[getTranslationFieldName('services')] }}</strong><br/>
-                <span v-for="srvc in selected_provider.services">{{ translate[getTranslationFieldName(srvc.name)] }}<br/></span>
+                <span v-for="srvc in selected_provider.services"
+                :key="srvc.id">{{ translate[getTranslationFieldName(srvc.name)] }}<br/></span>
                 <span v-if="!(selected_provider.services && selected_provider.services.length)">{{ translate[getTranslationFieldName('noServicesInfo')] }}</span>
               </p>
               <p class="col s6">
                 <strong>{{ translate[getTranslationFieldName('clientTypes')] }}</strong><br/>
-                <span v-for="ctype in selected_provider.client_types">{{ translate[getTranslationFieldName(ctype.name)] }}<br/></span>
+                <span v-for="ctype in selected_provider.client_types"
+                :key="ctype.id">{{ translate[getTranslationFieldName(ctype.name)] }}<br/></span>
                 <span v-if="!(selected_provider.client_types && selected_provider.client_types.length)">{{ translate[getTranslationFieldName('noClientsInfo')] }}</span>
               </p>
             </div>
             <div v-if="selected_provider.volunteer_contact_name" class="row">
-              <p class="col s12">
+              <div class="col s12">
                 <h6><strong>{{ translate[getTranslationFieldName('wantVolunteer')] }}</strong></h6>
                 <span>{{ translate[getTranslationFieldName('askFor')] }} <strong>{{ selected_provider.volunteer_contact_name }}</strong></span><br/>
                 <em>{{ selected_provider.volunteer_contact_email }}</em><br/>
                 <em>{{ selected_provider.volunteer_contact_phone }}</em>
-              </p>
+              </div>
             </div>
           </div>
           <div class="card-action">
@@ -592,14 +594,14 @@
 </script>
 
 <style>
-  #app {
-    /* font-family: 'Avenir', Helvetica, Arial, sans-serif; */
-    /* -webkit-font-smoothing: antialiased;
+  /* #app {
+    font-family: 'Avenir', Helvetica, Arial, sans-serif; 
+     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-align: center;
-    color: #2c3e50; */
-    /* margin-top: 60px; */
-  }
+    color: #2c3e50; 
+     margin-top: 60px; 
+  } */
 
   .icon-block {
     padding: 0 15px;

@@ -36,13 +36,15 @@
 	            			</div>
 	            			<div class="input-field col s2">
 								<select name="starthours" v-change="doStartHoursChange" v-model="newEvent.starttime.hours">
-									<option v-for="hour in hoursArray" :value="hour">{{hour}}</option>
+									<option v-for="hour in hoursArray"
+									:key="hour.id" :value="hour">{{hour}}</option>
 								</select>
 								<label>Hour</label>
 							</div>
 							<div class="input-field col s2">
 								<select name="startmins" v-change="doStartMinsChange" v-model="newEvent.starttime.mins">
-									<option v-for="min in minsArray" :value="min">{{min}}</option>
+									<option v-for="min in minsArray"
+									:key="min.id" :value="min">{{min}}</option>
 								</select>
 								<label>Mins</label>
 							</div>
@@ -61,13 +63,15 @@
 	            			</div>
 	            			<div class="input-field col s2">
 								<select name="endhour" v-change="doEndHoursChange" v-model="newEvent.endtime.hours">
-									<option v-for="hour in hoursArray" :value="hour">{{hour}}</option>
+									<option v-for="hour in hoursArray"
+									:key="hour.id" :value="hour">{{hour}}</option>
 								</select>
 								<label>Hour</label>
 							</div>
 							<div class="input-field col s2">
 								<select name="endmins" v-change="doEndMinsChange" v-model="newEvent.endtime.mins">
-									<option v-for="min in minsArray" :value="min">{{min}}</option>
+									<option v-for="min in minsArray"
+									:key="min.id" :value="min">{{min}}</option>
 								</select>
 								<label>Mins</label>
 							</div>
@@ -91,13 +95,14 @@
       							<input name="onlocation" type="radio" value="1" v-model="useLocations" id="venue2" />
       							<label for="venue2">Select one of your locations as venue</label>
     						</p>
-    						<p  class="col s12 underline"><p>
+    						<p  class="col s12 underline"></p>
             			</div>
             			<div v-show="useLocations == 1" class="row">
 							<div class="input-field col s12">
 								<select class="location-options" name="location" v-change="doLocationChange">
 									<option value="" selected>Choose a location</option>
-									<option v-for="loc in provider.locations" :value="loc.id" class="">{{loc.name}}</option>
+									<option v-for="loc in provider.locations"
+									:key="loc.id" :value="loc.id" class="">{{loc.name}}</option>
 								</select>
 								<label for="location">Your Locations</label>
 	            			</div>
@@ -148,7 +153,8 @@
 		        	</div>
 		        	<div class="row">
 						<!-- List events here... -->
-						<div v-for="event in events" class="col s12 event-card">
+						<div v-for="event in events"
+						:key="event.id" class="col s12 event-card">
     						<!-- <h5 class="header">{{ event.title }}</h5> -->
 							<div class="card horizontal">
 								<div class="card-image">
